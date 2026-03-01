@@ -188,7 +188,7 @@ export default function ContactForm() {
         setSending(true);
         setSendError(false);
         try {
-            const res = await fetch("https://formspree.io/f/xdklvnwz", {
+            const res = await fetch(process.env.NEXT_PUBLIC_FORMSPREE_URL!, {
                 method: "POST",
                 headers: { "Content-Type": "application/json", Accept: "application/json" },
                 body: JSON.stringify(values),
