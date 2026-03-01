@@ -168,7 +168,7 @@ export default function ContactForm() {
                 </SlideInLeft>
 
                 <SlideInRight delay={0.08} className="flex-1">
-                <form className="flex flex-col gap-4 px-6 sm:px-8 py-8 h-full" onSubmit={handleSubmit} noValidate>
+                <form className="flex flex-col gap-4 px-6 sm:px-8 py-8 h-full" noValidate onSubmit={handleSubmit} action="https://formspree.io/f/xdklvnwz" method="POST">
 
                     {submitted && (
                         <div className="bg-black text-white font-Inter text-[14px] tracking-[-0.02em] rounded-xl px-4 py-3">

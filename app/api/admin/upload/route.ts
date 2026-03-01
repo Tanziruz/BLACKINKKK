@@ -1,8 +1,7 @@
 import { NextResponse } from "next/server";
-import { writeFile, mkdir } from "fs/promises";
-import path from "path";
+import cloudinary from "@/lib/cloudinary";
 
-// POST /api/admin/upload — save an image to public/uploads/
+// POST /api/admin/upload — upload an image to Cloudinary
 // Body: multipart/form-data with a single "file" field
 export async function POST(request: Request) {
     try {
@@ -13,7 +12,6 @@ export async function POST(request: Request) {
             return NextResponse.json({ error: "No file provided." }, { status: 400 });
         }
 
-        // Only allow image types
         if (!file.type.startsWith("image/")) {
             return NextResponse.json(
                 { error: "Only image files are allowed." },
@@ -24,15 +22,18 @@ export async function POST(request: Request) {
         const bytes = await file.arrayBuffer();
         const buffer = Buffer.from(bytes);
 
-        // Build a unique filename: timestamp + original name (sanitised)
-        const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, "_");
-        const filename = `${Date.now()}_${safeName}`;
+        const result = await new Promise<{ secure_url: string }>((resolve, reject) => {
+            const stream = cloudinary.uploader.upload_stream(
+                { folder: "blackinkkk/products" },
+                (err, res) => {
+                    if (err || !res) return reject(err ?? new Error("Upload failed"));
+                    resolve(res as { secure_url: string });
+                }
+            );
+            stream.end(buffer);
+        });
 
-        const uploadsDir = path.join(process.cwd(), "public", "uploads");
-        await mkdir(uploadsDir, { recursive: true });
-        await writeFile(path.join(uploadsDir, filename), buffer);
-
-        return NextResponse.json({ url: `/uploads/${filename}` }, { status: 201 });
+        return NextResponse.json({ url: result.secure_url }, { status: 201 });
     } catch (err) {
         console.error(err);
         return NextResponse.json({ error: "Upload failed." }, { status: 500 });
