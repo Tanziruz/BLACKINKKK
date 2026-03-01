@@ -6,17 +6,40 @@ import { useState } from "react";
 import { z } from "zod";
 import { Stagger, StaggerItem, SlideInLeft, SlideInRight, FadeUp } from "../Animate";
 
-const contactSchema = z.object({
-    firstName: z.string().min(1, "First name is required"),
-    lastName: z.string().min(1, "Last name is required"),
-    email: z.string().min(1, "Email is required").email("Enter a valid email"),
-    phone: z
-        .string()
-        .min(7, "Phone number is too short")
-        .regex(/^[+\d\s\-().]+$/, "Enter a valid phone number"),
-    subject: z.string().min(3, "Subject must be at least 3 characters"),
-    message: z.string().min(10, "Message must be at least 10 characters"),
-});
+const contactSchema = z
+    .object({
+        firstName: z.string().min(1, "First name is required"),
+        lastName: z.string().min(1, "Last name is required"),
+        email: z.string().optional(),
+        phone: z.string().optional(),
+        subject: z.string().min(3, "Subject must be at least 3 characters"),
+        message: z.string().min(10, "Message must be at least 10 characters"),
+    })
+    .superRefine((data, ctx) => {
+        const hasEmail = data.email && data.email.trim().length > 0;
+        const hasPhone = data.phone && data.phone.replace(/\D/g, "").length >= 7;
+
+        if (!hasEmail && !hasPhone) {
+            ctx.addIssue({ code: z.ZodIssueCode.custom, message: "Enter a valid email", path: ["email"] });
+            ctx.addIssue({ code: z.ZodIssueCode.custom, message: "Phone number is too short", path: ["phone"] });
+        }
+        if (hasEmail) {
+            const emailResult = z.string().email("Enter a valid email").safeParse(data.email);
+            if (!emailResult.success) {
+                ctx.addIssue({ code: z.ZodIssueCode.custom, message: emailResult.error.issues[0].message, path: ["email"] });
+            }
+        }
+        if (hasPhone) {
+            const phoneResult = z
+                .string()
+                .min(7, "Phone number is too short")
+                .regex(/^[+\d\s\-().]+$/, "Enter a valid phone number")
+                .safeParse(data.phone);
+            if (!phoneResult.success) {
+                ctx.addIssue({ code: z.ZodIssueCode.custom, message: phoneResult.error.issues[0].message, path: ["phone"] });
+            }
+        }
+    });
 
 type ContactFields = z.infer<typeof contactSchema>;
 type FieldErrors = Partial<Record<keyof ContactFields, string>>;
@@ -95,6 +118,8 @@ export default function ContactForm() {
     const [values, setValues] = useState<ContactFields>(empty);
     const [errors, setErrors] = useState<FieldErrors>({});
     const [submitted, setSubmitted] = useState(false);
+    const [sending, setSending] = useState(false);
+    const [sendError, setSendError] = useState(false);
 
     const [dialCode, setDialCode] = useState("+91");
     const [phoneNum, setPhoneNum] = useState("");
@@ -104,15 +129,22 @@ export default function ContactForm() {
         setDialCode(normalized);
         const full = (normalized + " " + phoneNum).trim();
         setValues((prev) => ({ ...prev, phone: full }));
-        const result = contactSchema.shape.phone.safeParse(full);
-        if (result.success) setErrors((prev) => ({ ...prev, phone: undefined }));
+        const result = contactSchema.safeParse({ ...values, phone: full });
+        const phoneError = result.success ? undefined : result.error.issues.find((i) => i.path[0] === "phone");
+        if (!phoneError) setErrors((prev) => ({ ...prev, phone: undefined }));
     }
 
     function set(field: keyof ContactFields) {
         return (v: string) => {
-            setValues((prev) => ({ ...prev, [field]: v }));
-            const result = contactSchema.shape[field].safeParse(v);
-            if (result.success) setErrors((prev) => ({ ...prev, [field]: undefined }));
+            const next = { ...values, [field]: v };
+            setValues(next);
+            const result = contactSchema.safeParse(next);
+            if (result.success) {
+                setErrors({});
+            } else {
+                const fieldError = result.error.issues.find((i) => i.path[0] === field);
+                if (!fieldError) setErrors((prev) => ({ ...prev, [field]: undefined }));
+            }
         };
     }
 
@@ -120,21 +152,27 @@ export default function ContactForm() {
         setPhoneNum(num);
         const full = (dialCode + " " + num).trim();
         setValues((prev) => ({ ...prev, phone: full }));
-        const result = contactSchema.shape.phone.safeParse(full);
-        if (result.success) setErrors((prev) => ({ ...prev, phone: undefined }));
+        const result = contactSchema.safeParse({ ...values, phone: full });
+        const phoneError = result.success ? undefined : result.error.issues.find((i) => i.path[0] === "phone");
+        if (!phoneError) setErrors((prev) => ({ ...prev, phone: undefined }));
     }
 
     function blurField(field: keyof ContactFields) {
         return () => {
-            const result = contactSchema.shape[field].safeParse(values[field]);
-            setErrors((prev) => ({
-                ...prev,
-                [field]: result.success ? undefined : result.error.issues[0].message,
-            }));
+            const result = contactSchema.safeParse(values);
+            if (result.success) {
+                setErrors((prev) => ({ ...prev, [field]: undefined }));
+            } else {
+                const fieldError = result.error.issues.find((i) => i.path[0] === field);
+                setErrors((prev) => ({
+                    ...prev,
+                    [field]: fieldError ? fieldError.message : undefined,
+                }));
+            }
         };
     }
 
-    function handleSubmit(e: React.FormEvent) {
+    async function handleSubmit(e: React.FormEvent) {
         e.preventDefault();
         const result = contactSchema.safeParse(values);
         if (!result.success) {
@@ -147,9 +185,23 @@ export default function ContactForm() {
             return;
         }
         setErrors({});
-        setSubmitted(true);
-        setValues(empty);
-        setPhoneNum("");
+        setSending(true);
+        setSendError(false);
+        try {
+            const res = await fetch("https://formspree.io/f/xdklvnwz", {
+                method: "POST",
+                headers: { "Content-Type": "application/json", Accept: "application/json" },
+                body: JSON.stringify(values),
+            });
+            if (!res.ok) throw new Error("Failed");
+            setSubmitted(true);
+            setValues(empty);
+            setPhoneNum("");
+        } catch {
+            setSendError(true);
+        } finally {
+            setSending(false);
+        }
     }
 
     return (
@@ -168,11 +220,16 @@ export default function ContactForm() {
                 </SlideInLeft>
 
                 <SlideInRight delay={0.08} className="flex-1">
-                <form className="flex flex-col gap-4 px-6 sm:px-8 py-8 h-full" noValidate onSubmit={handleSubmit} action="https://formspree.io/f/xdklvnwz" method="POST">
+                <form className="flex flex-col gap-4 px-6 sm:px-8 py-8 h-full" noValidate onSubmit={handleSubmit}>
 
                     {submitted && (
                         <div className="bg-black text-white font-Inter text-[14px] tracking-[-0.02em] rounded-xl px-4 py-3">
                             Message sent! We&apos;ll get back to you soon.
+                        </div>
+                    )}
+                    {sendError && (
+                        <div className="bg-red-50 border border-red-200 text-red-600 font-Inter text-[14px] tracking-[-0.02em] rounded-xl px-4 py-3">
+                            Something went wrong. Please try again.
                         </div>
                     )}
 
@@ -182,10 +239,12 @@ export default function ContactForm() {
                     </div>
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <Field label="Email" type="email" placeholder="test@gmail.com" value={values.email} error={errors.email} onChange={set("email")} onBlur={blurField("email")} />
+                        <Field label={`Email${values.phone ? " (optional)" : ""}`} type="email" placeholder="test@gmail.com" value={values.email ?? ""} error={errors.email} onChange={set("email")} onBlur={blurField("email")} />
                         {/* Phone — code input + number input */}
                         <div className="flex flex-col gap-1.5">
-                            <label className="font-Inter text-black text-[14px] tracking-[-0.02em] font-medium">Phone No</label>
+                            <label className="font-Inter text-black text-[14px] tracking-[-0.02em] font-medium">
+                                Phone No{values.email ? " (optional)" : ""}
+                            </label>
                             <div className={`flex rounded-xl overflow-hidden bg-white transition ${
                                 errors.phone ? "ring-2 ring-red-400" : "focus-within:ring-2 focus-within:ring-black/10"
                             }`}>
@@ -204,10 +263,12 @@ export default function ContactForm() {
                                     onChange={(e) => handlePhoneNum(e.target.value)}
                                     onBlur={() => {
                                         const full = (dialCode + " " + phoneNum).trim();
-                                        const result = contactSchema.shape.phone.safeParse(full);
+                                        const next = { ...values, phone: full };
+                                        const result = contactSchema.safeParse(next);
+                                        const phoneError = result.success ? undefined : result.error.issues.find((i) => i.path[0] === "phone");
                                         setErrors((prev) => ({
                                             ...prev,
-                                            phone: result.success ? undefined : result.error.issues[0].message,
+                                            phone: phoneError ? phoneError.message : undefined,
                                         }));
                                     }}
                                     suppressHydrationWarning
@@ -240,9 +301,10 @@ export default function ContactForm() {
 
                     <button
                         type="submit"
-                        className="w-full bg-black text-white font-Inter text-[15px] tracking-[-0.02em] py-3.5 rounded-2xl hover:bg-black/85 transition duration-200 cursor-pointer"
+                        disabled={sending}
+                        className="w-full bg-black text-white font-Inter text-[15px] tracking-[-0.02em] py-3.5 rounded-2xl hover:bg-black/85 transition duration-200 cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
                     >
-                        Send Message
+                        {sending ? "Sending…" : "Send Message"}
                     </button>
                 </form>
                 </SlideInRight>
