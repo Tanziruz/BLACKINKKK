@@ -13,7 +13,7 @@ export default function About() {
                     title="Timeless design, modern wearability"
                     description="We focus on creating essential garments that remain relevant, functional, and refined across seasons."
                     button1Text="Our Story"
-                    button1Link="/products"
+                    button1Link="#our-story"
                     button2Text="Our Team"
                     button2Link="/contact"
                 />
