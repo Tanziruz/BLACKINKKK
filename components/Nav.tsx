@@ -159,6 +159,7 @@ export default function NavBar({ products = [] }: { products?: Product[] }) {
                                 exit={{ opacity: 0, y: 8 }}
                                 transition={{ delay: 0.05 + mobileLinks.length * 0.07, duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
                             >
+                                <Button variant="btn2" title="Shop all items" href="/products" />
                             </motion.div>
                         </div>
                     </motion.div>
