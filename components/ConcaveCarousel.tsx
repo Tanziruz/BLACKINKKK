@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useEffect, useCallback } from "react";
+import { useRef, useEffect, useCallback, useState } from "react";
 import {
   motion,
   useMotionValue,
@@ -10,20 +10,50 @@ import {
 import Image from "next/image";
 
 const slides = [
-  { src: "/1.avif", label: "Look 01" },
-  { src: "/2.avif", label: "Look 02" },
-  { src: "/3.avif", label: "Look 03" },
-  { src: "/4.avif", label: "Look 04" },
-  { src: "/5.avif", label: "Look 05" },
-  { src: "/6.avif", label: "Look 06" },
+      { src: `/CarouselImages/1.png`,   label: '' },
+      { src: `/CarouselImages/2.jpeg`,  label: '' },
+      { src: `/CarouselImages/3.jpeg`,  label: '' },
+      { src: `/CarouselImages/4.jpeg`,  label: '' },
+      { src: `/CarouselImages/5.jpg`,   label: '' },
+      { src: `/CarouselImages/6.jpg`,   label: '' },
+      { src: `/CarouselImages/7.jpg`,   label: '' },
+      { src: `/CarouselImages/8.jpg`,   label: '' },
+      { src: `/CarouselImages/9.jpg`,   label: '' },
+      { src: `/CarouselImages/10.jpg`,  label: '' },
+      { src: `/CarouselImages/11.jpg`,  label: '' },
+      { src: `/CarouselImages/12.jpg`,  label: '' },
+      { src: `/CarouselImages/13.jpg`,  label: '' },
+      { src: `/CarouselImages/14.jpg`,  label: '' },
+      { src: `/CarouselImages/15.jpg`,  label: '' },
+      { src: `/CarouselImages/16.jpeg`, label: '' },
 ];
+
+/* ── constants ── */
+const CARD_WIDTH_CSS = "clamp(160px, 18vw, 260px)";
+const GAP = 28;                       // desired px gap between cards
+
+/**
+ * Compute a radius that guarantees no overlap.
+ *
+ *   chord between adjacent centres = 2 · R · sin(π / N)
+ *   We need chord ≥ cardWidth + gap
+ *   →  R = (cardWidth + gap) / (2 · sin(π / N))
+ *
+ * Because CSS clamp is viewport-dependent we estimate the card width at
+ * runtime; the fallback hard-codes the clamp midpoint (~230 px).
+ */
+function autoRadius(count: number, estimatedCardWidth = 230) {
+  return Math.ceil(
+    (estimatedCardWidth + GAP) / (2 * Math.sin(Math.PI / count))
+  );
+}
 
 /* ── helper: per-card inline style ── */
 function cardStyle(i: number, count: number, radius: number) {
   const theta = (360 / count) * i;
   return {
     position: "absolute" as const,
-    width: "clamp(170px, 22vw, 290px)",
+    width: CARD_WIDTH_CSS,
     aspectRatio: "3 / 4",
     transform: `rotateY(${theta}deg) translateZ(${radius}px)`,
     backfaceVisibility: "hidden" as const,
@@ -49,7 +79,23 @@ function Card({ src, label }: { src: string; label: string }) {
 /* ── Main carousel ── */
 export default function ConcaveCarousel() {
   const count = slides.length;
-  const radius = 340;
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  /* Compute radius once on mount (and on resize) so it adapts to viewport */
+  const [radius, setRadius] = useState(() => autoRadius(count));
+
+  useEffect(() => {
+    function measure() {
+      if (!containerRef.current) return;
+      // Read the actual rendered card width from the first card element
+      const card = containerRef.current.querySelector<HTMLElement>("[data-card]");
+      const w = card ? card.offsetWidth : 230;
+      setRadius(autoRadius(count, w));
+    }
+    measure();
+    window.addEventListener("resize", measure);
+    return () => window.removeEventListener("resize", measure);
+  }, [count]);
 
   /* framer-motion values */
   const rawAngle = useMotionValue(0);
@@ -73,7 +119,7 @@ export default function ConcaveCarousel() {
       prev = now;
       if (!dragging.current) {
         // ~18°/sec at 60 fps
-        rawAngle.set(rawAngle.get() + 0.03 * dt);
+        rawAngle.set(rawAngle.get() + 0.018 * dt);
       }
       rafId.current = requestAnimationFrame(tick);
     };
@@ -113,10 +159,11 @@ export default function ConcaveCarousel() {
 
   return (
     <div
+      ref={containerRef}
       className="relative w-full cursor-grab active:cursor-grabbing select-none"
       style={{
-        height: "clamp(340px, 46vw, 560px)",
-        perspective: "1400px",
+        height: "clamp(360px, 50vw, 620px)",
+        perspective: `${Math.max(1400, radius * 3)}px`,
         perspectiveOrigin: "center 42%",
       }}
       onPointerDown={onDown}
@@ -132,7 +179,7 @@ export default function ConcaveCarousel() {
         }}
       >
         {slides.map((s, i) => (
-          <div key={i} style={cardStyle(i, count, radius)}>
+          <div key={i} data-card style={cardStyle(i, count, radius)}>
             <Card src={s.src} label={s.label} />
           </div>
         ))}

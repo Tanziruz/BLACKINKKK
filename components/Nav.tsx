@@ -68,7 +68,7 @@ export default function NavBar({ products = [] }: { products?: Product[] }) {
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: 0, duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
                 >
-                    <Link href="/" onClick={() => handleNavClick("/")}>BlackInkkk</Link>
+                    <Link href="/" onClick={() => handleNavClick("/")}> BLA<span className="radiant text-[22px]">C</span>KINKKK</Link>
                 </motion.span>
 
                 <div className="flex justify-center items-center gap-6 backdrop-blur-xs rounded-full px-4 py-2">
@@ -97,14 +97,14 @@ export default function NavBar({ products = [] }: { products?: Product[] }) {
 
             <div className="flex md:hidden justify-between items-center py-3 px-5">
                 <motion.span
-                    className={`font-Krona uppercase text-[17px] tracking-[-0.03em] leading-[1.4em] transition duration-300 ${
+                    className={`font-Fino uppercase text-[17px] tracking-[-0.03em] leading-[1.4em] transition duration-300 ${
                         isLight ? "text-white" : "text-black"
                     }`}
                     initial={{ opacity: 0, x: -16 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: 0.15, duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
                 >
-                    <Link href="/" onClick={() => handleNavClick("/")}>BlackInkkk</Link>
+                    <Link href="/" onClick={() => handleNavClick("/")}>BLA<span className="radiant text-[15.5px] mx-[0.7px]">C</span>KINKKK</Link>
                 </motion.span>
 
                 <motion.div

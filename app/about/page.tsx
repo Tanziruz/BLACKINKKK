@@ -7,7 +7,7 @@ export default function About() {
         <section className="max-w-screen w-screen overflow-hidden">
             <div className="h-dvh">
                 <TopPage 
-                    imageSrc="/About.avif"
+                    imageSrc="/About.png"
                     imageAlt="About Us Image"
                     tagTitle="Know About BLACKINKKK"
                     title="Timeless design, modern wearability"

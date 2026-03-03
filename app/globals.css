@@ -3,8 +3,6 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
-@custom-variant dark (&:is(.dark *));
-
 @font-face {
     font-family: Ronzino-Medium;
     src: url(/fonts/Ronzino-Medium.woff2) format("woff2");
@@ -25,12 +23,18 @@
     src: url(/fonts/KronaOne-Regular.ttf) format("truetype");
 }
 
+@font-face {
+    font-family: Radiant-Condensed;
+    src: url(/fonts/Radiant.ttf) format("truetype");
+}
+
 @theme{
     --font-Inter: Inter, sans-serif;
     --font-Ronzino-Medium: Ronzino-Medium, sans-serif;
     --font-Ronzino-Oblique: Ronzino-Oblique, sans-serif;
     --font-Fino: Fino-Sans, sans-serif;
     --font-Krona: KronaOne, sans-serif;
+    --font-Radiant: Radiant-Condensed, sans-serif;
     --color-gray: #787878;
     --color-white-15: rgba(255, 255, 255, 0.15);
     --color-white-20: rgba(255, 255, 255, 0.20);
@@ -134,6 +138,10 @@
 
     p.t24{
         @apply font-Ronzino-Oblique text-black text-[24px] tracking-[0em] leading-[1.55em] mb-5;
+    }
+
+    span.radiant {
+        @apply font-Radiant
     }
 
     button.btn1 {

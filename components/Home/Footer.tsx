@@ -21,7 +21,7 @@ export default function Footer() {
                 <Stagger className="flex flex-col sm:flex-row gap-10 lg:gap-6" stagger={0.1}>
 
                     <StaggerItem className="flex flex-col gap-2 sm:w-[42%] lg:w-auto lg:flex-[1.6]">
-                        <span className="font-Fino  text-white text-xl tracking-[0.12em] uppercase">
+                        <span className="font-Radiant  text-white text-xl tracking-[0.12em] uppercase">
                             BLACKINKKK
                         </span>
                         <p className="t16 text-white-60 mb-0! max-w-67.5">
@@ -80,7 +80,7 @@ export default function Footer() {
 
             <FadeUp distance={16} className="mt-4">
                 <p className="font-Fino text-white uppercase select-none leading-[0.84em] tracking-[-0.02em] text-[18.5vw] px-5 mb-0!">
-                    BLACKINKKK
+                    BLA<span className="radiant text-[16.5vw]">C</span>KINKKK
                 </p>
             </FadeUp>
 

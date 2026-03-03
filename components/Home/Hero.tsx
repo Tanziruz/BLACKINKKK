@@ -6,17 +6,15 @@ import Button from "../Buttons_And_Links/Button";
 import { EntryStagger, EntryItem } from "../Animate";
 
 const thumbnails = [
-  { src: "/1.avif",       label: "classNameic" },
-  { src: "/2.avif", label: "Shadow" },
-  { src: "/3.avif",          label: "Dusk" },
-  { src: "/HeroImg.avif",        label: "Arctic" },
-  { src: "/5.avif",           label: "Stone" },
-  { src: "/6.avif",       label: "Slate" },
-  { src: "/4.avif", label: "Noir" },
+  { src: "/Img1.jpg", label: "Sage Green" },
+  { src: "/Img2.png", label: "Red" },
+  { src: "/Img3.png", label: "Navy Blue" },
+  { src: "/Img4.png", label: "Off White" },
+  { src: "/Img5.png", label: "Black" },
 ];
 
 export default function Hero() {
-  const [activeIndex, setActiveIndex] = useState(3);
+  const [activeIndex, setActiveIndex] = useState(2);
 
   // Auto-advance every 5 seconds; reset timer when user clicks
   useEffect(() => {
