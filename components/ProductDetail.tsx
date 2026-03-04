@@ -34,6 +34,7 @@ const CONTACT_EMAIL    = "Blackinkkk@aol.com"; // replace with real email
 const CONTACT_PHONE    = "+919810367883"; // replace with real phone
 
 const E = [0.22, 1, 0.36, 1] as const;
+const PLACEHOLDER = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1' height='1'/%3E";
 function entry(delay = 0) {
     return {
         initial: { opacity: 0, y: 18 },
@@ -192,9 +193,9 @@ export default function ProductDetail({ product }: Props) {
     const [activeColorIndex, setActiveColorIndex] = useState(0);
     const [showContact, setShowContact] = useState(false);
 
-    const currentImageMain = hasColors
+    const currentImageMain = (hasColors
         ? product.colors![activeColorIndex].image_main
-        : product.image_main;
+        : product.image_main) || PLACEHOLDER;
 
     const thumbnails = hasColors
         ? product.colors!.map((c) => ({ src: c.image_main, label: c.name }))
@@ -239,7 +240,7 @@ export default function ProductDetail({ product }: Props) {
                                             }`}
                                         >
                                             <Image
-                                                src={thumb.src}
+                                                src={thumb.src || PLACEHOLDER}
                                                 alt={thumb.label}
                                                 fill
                                                 className="object-cover object-center"

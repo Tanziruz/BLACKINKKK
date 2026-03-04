@@ -5,6 +5,9 @@ import ProductImageSwitch from "../Buttons_And_Links/ProductImageSwitch";
 import { useState } from "react";
 import ProductPageArrow from "../Buttons_And_Links/ProductPageArrow";
 
+// Transparent 1×1 grey placeholder used when a product has no image yet
+const PLACEHOLDER = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1' height='1'/%3E";
+
 
 interface ProductCardProps {
     id: string;
@@ -20,6 +23,8 @@ interface ProductCardProps {
 export default function ProductCard({ id, image_main, image_hover, tag, title, price, originalPrice, stock }: ProductCardProps) {
     const [hovered, setHovered] = useState(false);
     const soldOut = stock === 0;
+    const mainSrc  = image_main  || PLACEHOLDER;
+    const hoverSrc = image_hover || image_main || PLACEHOLDER;
 
     return (
         <Link href={`/products/${id}`} className="block w-full h-fit">
@@ -43,13 +48,13 @@ export default function ProductCard({ id, image_main, image_hover, tag, title, p
                 </div>
 
                 <Image
-                    src={image_main}
+                    src={mainSrc}
                     alt="Product_Image"
                     fill
                     className="object-cover object-center transition-opacity duration-500 opacity-100 group-hover:opacity-0"
                 />
                 <Image
-                    src={image_hover}
+                    src={hoverSrc}
                     alt="Product_Image_Hover"
                     fill
                     className="object-cover object-center transition-opacity duration-500 opacity-0 group-hover:opacity-100"
@@ -82,8 +87,8 @@ export default function ProductCard({ id, image_main, image_hover, tag, title, p
                         )}
                     </div>
                     <div className="flex items-center gap-2 relative bottom-4">
-                        <ProductImageSwitch image={image_main} isActive={!hovered}/>
-                        <ProductImageSwitch image={image_hover} isActive={hovered}/>
+                        <ProductImageSwitch image={mainSrc} isActive={!hovered}/>
+                        <ProductImageSwitch image={hoverSrc} isActive={hovered}/>
                     </div>
                 </div>
             </div>
