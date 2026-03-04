@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 import type { Product } from "@/types/product";
 import clientPromise from "@/lib/mongodb";
 
@@ -54,6 +55,10 @@ export async function POST(request: Request) {
         const col = await collection();
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         await (col as any).insertOne(newProduct);
+
+        // Bust the Next.js cache so the home & products pages show the new product
+        revalidatePath("/");
+        revalidatePath("/products");
 
         return NextResponse.json(newProduct, { status: 201 });
     } catch (err) {

@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 import type { Product } from "@/types/product";
 import clientPromise from "@/lib/mongodb";
 
@@ -30,6 +31,10 @@ export async function PUT(
             return NextResponse.json({ error: "Product not found." }, { status: 404 });
         }
 
+        revalidatePath("/");
+        revalidatePath("/products");
+        revalidatePath(`/products/${id}`);
+
         return NextResponse.json(result);
     } catch (err) {
         console.error(err);
@@ -51,6 +56,10 @@ export async function DELETE(
         if (result.deletedCount === 0) {
             return NextResponse.json({ error: "Product not found." }, { status: 404 });
         }
+
+        revalidatePath("/");
+        revalidatePath("/products");
+        revalidatePath(`/products/${id}`);
 
         return NextResponse.json({ ok: true });
     } catch (err) {
