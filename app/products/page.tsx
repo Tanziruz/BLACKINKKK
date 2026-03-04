@@ -1,6 +1,9 @@
 import TopPage from "@/components/TopPage";
 import AllProductsGrid from "@/components/AllProductsGrid";
 import CatalogHeading from "@/components/CatalogHeading";
+
+// Always fetch fresh product data from the database
+export const dynamic = "force-dynamic";
 import { LayoutGrid } from "lucide-react";
 import StayConnected from "@/components/Home/StayConnected";
 
