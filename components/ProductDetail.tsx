@@ -7,13 +7,13 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
     Globe2,
     Scissors,
-    BadgeCheck,
     ShieldCheck,
     MapPin,
     CreditCard,
     RotateCcw,
     Mail,
     PhoneCall,
+    Ruler,
     X,
 } from "lucide-react";
 import type { Product } from "@/types/product";
@@ -160,6 +160,123 @@ function ContactSheet({ productTitle, onClose }: { productTitle: string; onClose
 }
 // ─────────────────────────────────────────────────────────────────────────────
 
+// ─────────────────────────────────────────────────────────────────────────────
+// Size Selector
+// ─────────────────────────────────────────────────────────────────────────────
+function SizeSelector({ sizes }: { sizes: string[] }) {
+    const [selected, setSelected] = useState<string | null>(null);
+    return (
+        <motion.div {...entry(0.40)} className="mb-5">
+            <p className="font-Inter text-[13px] text-black mb-2.5">
+                <span className="font-medium">Size</span>
+                {selected && <span className="text-gray ml-2">{selected}</span>}
+            </p>
+            <div className="flex flex-wrap items-center gap-2">
+                {sizes.map((size) => (
+                    <button
+                        key={size}
+                        onClick={() => setSelected(size === selected ? null : size)}
+                        className={`min-w-11 h-11 px-3 rounded-xl font-Inter text-[13px] font-medium tracking-[-0.01em] border transition-all duration-200 cursor-pointer ${
+                            size === selected
+                                ? "bg-black text-white border-black"
+                                : "bg-white text-black border-black/15 hover:border-black/50"
+                        }`}
+                    >
+                        {size}
+                    </button>
+                ))}
+            </div>
+        </motion.div>
+    );
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Size Chart
+// ─────────────────────────────────────────────────────────────────────────────
+const SIZE_CHART_ROWS = [
+    { size: "Small",  chestIn: 40, chestCm: 102, bodyIn: 27, bodyCm: 69,  sleeveIn: 8.5, sleeveCm: 22 },
+    { size: "Medium", chestIn: 42, chestCm: 107, bodyIn: 28, bodyCm: 72,  sleeveIn: 9,   sleeveCm: 23 },
+    { size: "Large",  chestIn: 44, chestCm: 112, bodyIn: 29, bodyCm: 74,  sleeveIn: 9.5, sleeveCm: 24 },
+    { size: "XL",     chestIn: 47, chestCm: 120, bodyIn: 30, bodyCm: 76,  sleeveIn: 10,  sleeveCm: 25 },
+];
+
+function SizeChart() {
+    return (
+        <section className="px-4 sm:px-6 md:px-10 lg:px-16 pb-10 md:pb-14">
+            <div className="bg-white rounded-2xl overflow-hidden border border-black/8">
+                {/* Header */}
+                <div className="flex items-center gap-3 px-5 py-4 border-b border-black/8">
+                    <div className="w-8 h-8 rounded-lg bg-black flex items-center justify-center shrink-0">
+                        <Ruler className="w-4 h-4 text-white" strokeWidth={1.75} />
+                    </div>
+                    <div>
+                        <p className="font-Ronzino-Medium text-black text-[14px] md:text-[15px] tracking-[-0.02em] leading-none mb-0.5">
+                            Size Chart
+                        </p>
+                        <p className="font-Inter text-[11px] text-gray tracking-[-0.01em]">
+                            Find your perfect fit
+                        </p>
+                    </div>
+                </div>
+
+                {/* Table */}
+                <div className="overflow-x-auto">
+                    <table className="w-full text-left border-collapse min-w-120">
+                        <thead>
+                            <tr className="bg-black/4">
+                                <th rowSpan={2} className="px-5 py-3 font-Inter text-[11px] font-semibold text-black/60 tracking-[0.08em] uppercase border-b border-r border-black/8 align-middle whitespace-nowrap">
+                                    Size
+                                </th>
+                                <th colSpan={2} className="px-5 py-2 font-Inter text-[11px] font-semibold text-black/60 tracking-[0.08em] uppercase border-b border-r border-black/8 text-center">
+                                    Chest
+                                </th>
+                                <th colSpan={2} className="px-5 py-2 font-Inter text-[11px] font-semibold text-black/60 tracking-[0.08em] uppercase border-b border-r border-black/8 text-center">
+                                    Body Length
+                                </th>
+                                <th colSpan={2} className="px-5 py-2 font-Inter text-[11px] font-semibold text-black/60 tracking-[0.08em] uppercase border-b border-black/8 text-center">
+                                    Sleeve Length
+                                </th>
+                            </tr>
+                            <tr className="bg-black/4">
+                                {["Inch", "Cm", "Inch", "Cm", "Inch", "Cm"].map((label, i) => (
+                                    <th
+                                        key={i}
+                                        className={`px-4 py-2 font-Inter text-[11px] font-medium text-black/50 tracking-[-0.01em] italic border-b border-black/8 text-center ${i !== 5 ? "border-r" : ""}`}
+                                    >
+                                        {label}
+                                    </th>
+                                ))}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {SIZE_CHART_ROWS.map((row, idx) => (
+                                <tr
+                                    key={row.size}
+                                    className={idx % 2 === 0 ? "bg-white" : "bg-[#F4F4F4]/60"}
+                                >
+                                    <td className="px-5 py-3.5 font-Ronzino-Medium text-black text-[14px] tracking-[-0.02em] border-r border-black/8 italic whitespace-nowrap">
+                                        {row.size}
+                                    </td>
+                                    {[row.chestIn, row.chestCm, row.bodyIn, row.bodyCm, row.sleeveIn, row.sleeveCm].map((val, i) => (
+                                        <td
+                                            key={i}
+                                            className={`px-4 py-3.5 font-Inter text-[13px] text-black/75 text-center ${i !== 5 ? "border-r border-black/8" : ""}`}
+                                        >
+                                            {val}
+                                        </td>
+                                    ))}
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+    );
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+
 interface Props {
     product: Product;
 }
@@ -273,11 +390,11 @@ export default function ProductDetail({ product }: Props) {
 
                         <motion.div {...entry(0.26)} className="flex items-baseline gap-3 mb-5">
                             <span className="font-Ronzino-Medium text-black text-[22px] md:text-[26px] tracking-[-0.03em] leading-[1.4em]">
-                                USD ${product.price.toFixed(2)}
+                                ₹{product.price.toFixed(2)}
                             </span>
                             {product.originalPrice && (
                                 <span className="font-Ronzino-Medium text-gray-2 text-[15px] md:text-[16px] tracking-[-0.035em] leading-[1.5em] line-through">
-                                    USD ${product.originalPrice.toFixed(2)}
+                                    ₹{product.originalPrice.toFixed(2)}
                                 </span>
                             )}
                         </motion.div>
@@ -313,6 +430,11 @@ export default function ProductDetail({ product }: Props) {
                                     ))}
                                 </div>
                             </motion.div>
+                        )}
+
+                        {/* Size selector */}
+                        {product.sizes && product.sizes.length > 0 && (
+                            <SizeSelector sizes={product.sizes} />
                         )}
 
                         <motion.div {...entry(0.46)} className="mb-6">
@@ -361,7 +483,7 @@ export default function ProductDetail({ product }: Props) {
                                     </div>
                                 </div>
 
-                                <div className="flex items-start gap-3.5 py-4 border-b border-black/10">
+                                <div className="flex items-start gap-3.5 py-4">
                                     <Scissors className="w-4.5 h-4.5 text-black mt-0.5 shrink-0" strokeWidth={1.5} />
                                     <div className="flex-1 flex flex-col sm:flex-row sm:justify-between sm:gap-4">
                                         <span className="font-Inter text-[13px] md:text-[14px] text-black font-medium leading-[1.5em] shrink-0">
@@ -372,23 +494,14 @@ export default function ProductDetail({ product }: Props) {
                                         </span>
                                     </div>
                                 </div>
-
-                                <div className="flex items-start gap-3.5 py-4">
-                                    <BadgeCheck className="w-4.5 h-4.5 text-black mt-0.5 shrink-0" strokeWidth={1.5} />
-                                    <div className="flex-1 flex flex-col sm:flex-row sm:justify-between sm:gap-4">
-                                        <span className="font-Inter text-[13px] md:text-[14px] text-black font-medium leading-[1.5em] shrink-0">
-                                            Warranty
-                                        </span>
-                                        <span className="font-Inter text-[13px] md:text-[14px] text-gray leading-[1.5em] sm:text-right">
-                                            {product.details.warranty}
-                                        </span>
-                                    </div>
-                                </div>
                             </motion.div>
                         )}
                     </div>
                 </div>
             </section>
+
+            {/* Size Chart */}
+            <SizeChart />
 
             <section className="px-4 sm:px-6 md:px-10 lg:px-16 pb-12 md:pb-16 lg:pb-20">
                 <Stagger className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4" stagger={0.1}>

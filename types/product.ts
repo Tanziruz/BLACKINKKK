@@ -9,7 +9,6 @@ export interface ProductColor {
 export interface ProductDetails {
     material: string;
     care: string;
-    warranty: string;
 }
 
 export interface Product {
@@ -26,4 +25,5 @@ export interface Product {
     description?: string;
     details?: ProductDetails;
     colors: ProductColor[];
+    sizes?: string[];
 }

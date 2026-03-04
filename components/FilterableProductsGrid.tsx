@@ -319,6 +319,7 @@ export default function FilterableProductsGrid({ products }: { products: Product
                             image_hover={product.image_hover}
                             tag={resolveTag(product.tag)}
                             stock={product.stock}
+                            sizes={product.sizes}
                         />
                     ))}
                 </div>

@@ -48,8 +48,9 @@ export async function POST(request: Request) {
             stock: Number(body.stock ?? 0),
             category: body.category ?? "",
             description: body.description ?? "",
-            details: body.details ?? { material: "", care: "", warranty: "" },
+            details: body.details ?? { material: "", care: "" },
             colors: body.colors ?? [],
+            sizes: body.sizes ?? [],
         };
 
         const col = await collection();

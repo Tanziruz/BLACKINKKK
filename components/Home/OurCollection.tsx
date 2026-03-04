@@ -52,9 +52,9 @@ export default function OurCollection() {
                                 <div>
                                     <p className="t14 text-[14px]! mb-0.5!">Pricing start from:</p>
                                     <div className="flex items-center gap-2">
-                                        <p className="t16 mb-0! text-black! font-[520]">$45.00</p>
+                                        <p className="t16 mb-0! text-black! font-[520]">₹45.00</p>
                                         <span className="text-black/40 text-sm">—</span>
-                                        <p className="t16 mb-0! text-black! font-[520]">$180.00</p>
+                                        <p className="t16 mb-0! text-black! font-[520]">₹180.00</p>
                                     </div>
                                 </div>
                             </div>

@@ -16,6 +16,9 @@ interface ColorDraft {
     image_hover: string;
 }
 
+const ALL_SIZES = ["XS", "S", "M", "L", "XL", "XXL"] as const;
+type Size = (typeof ALL_SIZES)[number];
+
 interface ProductDraft {
     title: string;
     price: string;
@@ -29,7 +32,7 @@ interface ProductDraft {
     image_hover: string;
     material: string;
     care: string;
-    warranty: string;
+    sizes: Size[];
     colors: ColorDraft[];
 }
 
@@ -46,7 +49,7 @@ const EMPTY_DRAFT: ProductDraft = {
     image_hover: "",
     material: "",
     care: "",
-    warranty: "",
+    sizes: [],
     colors: [],
 };
 
@@ -122,7 +125,7 @@ function productToDraft(p: Product): ProductDraft {
         image_hover: p.image_hover,
         material: p.details?.material ?? "",
         care: p.details?.care ?? "",
-        warranty: p.details?.warranty ?? "",
+        sizes: (p.sizes ?? []) as Size[],
         colors: p.colors.map((c) => ({
             name: c.name,
             hex: c.hex,
@@ -193,10 +196,10 @@ function AdminProductCard({
                 </p>
                 <p className="text-white/40 text-xs">{product.category}</p>
                 <div className="flex items-baseline gap-2 mt-auto pt-2">
-                    <span className="text-white text-sm font-semibold">${product.price}</span>
+                    <span className="text-white text-sm font-semibold">₹{product.price}</span>
                     {product.originalPrice > product.price && (
                         <span className="text-white/30 text-xs line-through">
-                            ${product.originalPrice}
+                            ₹{product.originalPrice}
                         </span>
                     )}
                     <span className="ml-auto text-white/30 text-xs">{product.stock} in stock</span>
@@ -362,8 +365,8 @@ function AddProductModal({
                 details: {
                     material: draft.material.trim(),
                     care: draft.care.trim(),
-                    warranty: draft.warranty.trim(),
                 },
+                sizes: draft.sizes,
                 colors: draft.colors
                     .filter((c) => c.name.trim())
                     .map((c) => ({
@@ -501,9 +504,38 @@ function AddProductModal({
                             <FieldLabel>Care instructions</FieldLabel>
                             <TextInput value={draft.care} onChange={(v) => set("care", v)} placeholder="e.g. Dry clean only" />
                         </div>
-                        <div className="flex flex-col gap-1.5">
-                            <FieldLabel>Warranty</FieldLabel>
-                            <TextInput value={draft.warranty} onChange={(v) => set("warranty", v)} placeholder="e.g. One year full quality guarantee" />
+                    </section>
+
+                    <Divider />
+
+                    {/* ── SIZES ── */}
+                    <section className="flex flex-col gap-4">
+                        <SectionHeading>Available Sizes</SectionHeading>
+                        <div className="flex flex-wrap gap-2">
+                            {ALL_SIZES.map((size) => {
+                                const active = draft.sizes.includes(size);
+                                return (
+                                    <button
+                                        key={size}
+                                        type="button"
+                                        onClick={() =>
+                                            set(
+                                                "sizes",
+                                                active
+                                                    ? draft.sizes.filter((s) => s !== size)
+                                                    : [...draft.sizes, size]
+                                            )
+                                        }
+                                        className={`px-4 py-2 text-xs tracking-widest uppercase border transition-colors ${
+                                            active
+                                                ? "bg-white text-black border-white"
+                                                : "bg-transparent text-white/40 border-white/15 hover:border-white/40 hover:text-white/70"
+                                        }`}
+                                    >
+                                        {size}
+                                    </button>
+                                );
+                            })}
                         </div>
                     </section>
 
