@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { revalidatePath } from "next/cache";
-import type { Product } from "@/types/product";
+import type { Product, ProductColor, SizeStock } from "@/types/product";
 import clientPromise from "@/lib/mongodb";
 
 const DB = "blackinkkk";
@@ -9,6 +9,25 @@ const COLLECTION = "products";
 async function collection() {
     const client = await clientPromise;
     return client.db(DB).collection<Product>(COLLECTION);
+}
+
+function computeTotalStock(
+    colors: ProductColor[],
+    sizeStocks?: SizeStock[],
+    fallback = 0
+): number {
+    if (colors.length > 0) {
+        const total = colors.reduce(
+            (sum, c) =>
+                sum + (c.sizeStocks ?? []).reduce((s, ss) => s + ss.stock, 0),
+            0
+        );
+        if (total > 0) return total;
+    }
+    if (sizeStocks && sizeStocks.length > 0) {
+        return sizeStocks.reduce((sum, ss) => sum + ss.stock, 0);
+    }
+    return fallback;
 }
 
 // GET /api/admin/products — return all products
@@ -36,6 +55,17 @@ export async function POST(request: Request) {
             );
         }
 
+        const colors: ProductColor[] = (body.colors ?? []).map(
+            (c: ProductColor) => ({
+                name: c.name,
+                hex: c.hex,
+                image_main: c.image_main,
+                sizeStocks: c.sizeStocks ?? [],
+            })
+        );
+
+        const sizeStocks: SizeStock[] = body.sizeStocks ?? [];
+
         const newProduct: Product = {
             id: `prod-${Date.now()}`,
             title: body.title,
@@ -45,12 +75,13 @@ export async function POST(request: Request) {
             image_hover: body.image_hover ?? body.image_main ?? "",
             tag: body.tag ?? null,
             includeHome: body.includeHome ?? false,
-            stock: Number(body.stock ?? 0),
+            stock: computeTotalStock(colors, sizeStocks, Number(body.stock ?? 0)),
             category: body.category ?? "",
             description: body.description ?? "",
             details: body.details ?? { material: "", care: "" },
-            colors: body.colors ?? [],
+            colors,
             sizes: body.sizes ?? [],
+            sizeStocks,
         };
 
         const col = await collection();

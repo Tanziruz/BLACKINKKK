@@ -1,9 +1,15 @@
 export type ProductTag = "best-seller" | "new" | null;
 
+export interface SizeStock {
+    size: string;
+    stock: number;
+}
+
 export interface ProductColor {
     name: string;
     hex: string;
     image_main: string;
+    sizeStocks?: SizeStock[];
 }
 
 export interface ProductDetails {
@@ -26,4 +32,5 @@ export interface Product {
     details?: ProductDetails;
     colors: ProductColor[];
     sizes?: string[];
+    sizeStocks?: SizeStock[];
 }

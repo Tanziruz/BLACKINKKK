@@ -209,7 +209,7 @@ export default function ContactForm() {
 
             <Stagger className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4" stagger={0.1}>
                 <StaggerItem><InfoCard icon={Mail} value="Blackinkkk@aol.com" label="Email Address" /></StaggerItem>
-                <StaggerItem><InfoCard icon={Phone} value="+91 98103 67883" label="Phone Number" /></StaggerItem>
+                <StaggerItem><InfoCard icon={Phone} value="+91 98103 67883" label="Whatsapp Number" /></StaggerItem>
                 <StaggerItem><InfoCard icon={MapPin} value="Ghaziabad, Uttar Pradesh 201001" label="Location" /></StaggerItem>
             </Stagger>
 

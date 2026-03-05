@@ -1,10 +1,29 @@
 import { NextResponse } from "next/server";
 import { revalidatePath } from "next/cache";
-import type { Product } from "@/types/product";
+import type { Product, ProductColor, SizeStock } from "@/types/product";
 import clientPromise from "@/lib/mongodb";
 
 const DB = "blackinkkk";
 const COLLECTION = "products";
+
+function computeTotalStock(
+    colors: ProductColor[],
+    sizeStocks?: SizeStock[],
+    fallback = 0
+): number {
+    if (colors.length > 0) {
+        const total = colors.reduce(
+            (sum, c) =>
+                sum + (c.sizeStocks ?? []).reduce((s, ss) => s + ss.stock, 0),
+            0
+        );
+        if (total > 0) return total;
+    }
+    if (sizeStocks && sizeStocks.length > 0) {
+        return sizeStocks.reduce((sum, ss) => sum + ss.stock, 0);
+    }
+    return fallback;
+}
 
 // PUT /api/admin/products/[id]
 export async function PUT(
@@ -18,6 +37,15 @@ export async function PUT(
         // Disallow changing the id via body
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const { id: _id, _id: __id, ...update } = body;
+
+        // Recompute total stock if variant data is present
+        if (update.colors || update.sizeStocks) {
+            update.stock = computeTotalStock(
+                update.colors ?? [],
+                update.sizeStocks,
+                Number(update.stock ?? 0)
+            );
+        }
 
         const client = await clientPromise;
         const col = client.db(DB).collection<Product>(COLLECTION);

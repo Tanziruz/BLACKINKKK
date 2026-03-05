@@ -61,14 +61,14 @@ export default function NavBar({ products = [] }: { products?: Product[] }) {
         >
             <div className="hidden md:grid grid-cols-3 items-center py-2 px-5">
                 <motion.span
-                    className={`font-Fino uppercase text-[25px] tracking-wider leading-[1.4em] transition duration-300 justify-self-start hover:scale-105 ${
+                    className={`font-Fino uppercase text-[55px] tracking-wider leading-[1.4em] transition duration-300 justify-self-start hover:scale-105 ${
                         scrolled || isProductDetail ? "text-black" : "text-white"
                     }`}
                     initial={{ opacity: 0, x: 0 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: 0, duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
                 >
-                    <Link href="/" onClick={() => handleNavClick("/")}> BLA<span className="radiant text-[22px]">C</span>KINKKK</Link>
+                    <Link href="/" onClick={() => handleNavClick("/")}> BLA<span className="radiant text-[52px]">C</span>KINKKK</Link>
                 </motion.span>
 
                 <div className="flex justify-center items-center gap-6 backdrop-blur-xs rounded-full px-4 py-2">
@@ -97,7 +97,7 @@ export default function NavBar({ products = [] }: { products?: Product[] }) {
 
             <div className="flex md:hidden justify-between items-center py-3 px-5">
                 <motion.span
-                    className={`font-Fino uppercase text-[17px] tracking-[-0.03em] leading-[1.4em] transition duration-300 ${
+                    className={`font-Fino uppercase text-[44px] tracking-[-0.03em] leading-[1.4em] transition duration-300 ${
                         isLight ? "text-white" : "text-black"
                     }`}
                     initial={{ opacity: 0, x: -16 }}
