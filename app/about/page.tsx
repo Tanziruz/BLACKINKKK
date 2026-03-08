@@ -19,7 +19,6 @@ export default function About() {
                     button2Link="/team"
                 />
             </div>
-            <TeamSection />
             <OurStory />
             <StayConnected />
         </section>
