@@ -42,26 +42,19 @@ export default function Hero() {
       </div>
 
       <EntryStagger className="flex flex-col items-center gap-3 w-full max-w-155 px-5 text-center" delayChildren={0.2} stagger={0.11}>
-        <EntryItem>
-          <div className="w-fit bg-white-15 backdrop-blur-sm rounded-full px-3.5 py-1.5">
-            <p className="font-Ronzino-Medium text-white text-[12px] lg:text-[13px] tracking-[-0.025em] leading-[1.4em] mb-0!">
-              Unisex Oversized
-            </p>
-          </div>
-        </EntryItem>
 
         <EntryItem distance={30}>
-          <h1 className="text-center text-5xl lg:text-6xl">Premium wear<br />for modern living</h1>
+          <h1 className="text-center text-5xl lg:text-6xl">Comfort wear <br/> for modern living</h1>
         </EntryItem>
 
         <EntryItem>
           <p className="t18 text-white-80! text-center mb-3 hidden lg:block">
-            Discover our new range of soft clothes made for your daily <br /> look and
-            your best days with the finest fabrics.
+            Discover our new range of unisex oversized T-shirts <br/> made for your daily look and
+            your best days.
           </p>
           <p className="t18 text-white-80! text-center leading-[1.5em] mb-3 hidden max-lg:block">
-            Discover our new range of soft clothes made for your daily look and
-            your best days with the finest fabrics.
+            Discover our new range of unisex oversized T-shirts made for your daily look and
+            your best days.
           </p>
         </EntryItem>
 

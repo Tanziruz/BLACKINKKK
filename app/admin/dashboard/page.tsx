@@ -21,6 +21,7 @@ const ALL_SIZES = ["XS", "S", "M", "L", "XL", "XXL"] as const;
 type Size = (typeof ALL_SIZES)[number];
 
 interface ProductDraft {
+    sku: string;
     title: string;
     price: string;
     originalPrice: string;
@@ -39,6 +40,7 @@ interface ProductDraft {
 }
 
 const EMPTY_DRAFT: ProductDraft = {
+    sku: "",
     title: "",
     price: "",
     originalPrice: "",
@@ -116,6 +118,7 @@ function TextAreaInput({
 // ─────────────────────────────────────────────────────────────────────────────
 function productToDraft(p: Product): ProductDraft {
     return {
+        sku: p.id,
         title: p.title,
         price: String(p.price),
         originalPrice: String(p.originalPrice),
@@ -431,6 +434,10 @@ function AddProductModal({
 
     async function handleSubmit(e: React.FormEvent) {
         e.preventDefault();
+        if (!draft.sku.trim()) {
+            setError("SKU code is required.");
+            return;
+        }
         if (!draft.title.trim() || !draft.price.trim() || !draft.originalPrice.trim()) {
             setError("Title, price, and original price are required.");
             return;
@@ -460,6 +467,7 @@ function AddProductModal({
                     : [];
 
             const body = {
+                id: draft.sku.trim(),
                 title: draft.title.trim(),
                 price: Number(draft.price),
                 originalPrice: Number(draft.originalPrice),
@@ -538,6 +546,10 @@ function AddProductModal({
                     {/* ── BASIC INFO ── */}
                     <section className="flex flex-col gap-4">
                         <SectionHeading>Basic Info</SectionHeading>
+                        <div className="flex flex-col gap-1.5">
+                            <FieldLabel>SKU Code *</FieldLabel>
+                            <TextInput value={draft.sku} onChange={(v) => set("sku", v.toUpperCase().replace(/\s+/g, "-"))} placeholder="e.g. BLK-TS-001" />
+                        </div>
                         <div className="flex flex-col gap-1.5">
                             <FieldLabel>Product name *</FieldLabel>
                             <TextInput value={draft.title} onChange={(v) => set("title", v)} placeholder="e.g. Arctic Oversized Jacket" />

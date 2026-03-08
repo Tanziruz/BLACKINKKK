@@ -12,14 +12,14 @@ export default function OurCollection() {
                 TagIcon={Shirt}
                 buttonTitle="Shop All Items"
                 HeadingTitle1="Modern Collections"
-                HeadingTitle2="Defined by Simplicity"
+                HeadingTitle2="Defined by Street Fashion"
                 hrefButton="/products"
                 hrefTag="/products"
             />
             <div className="flex flex-col min-[950px]:flex-row gap-4 mt-2">
                 <SlideInLeft className="relative w-full min-[950px]:w-1/2 aspect-480/460 rounded-3xl overflow-hidden">
                     <Image
-                        src="/full.avif"
+                        src="/Our_Collection.jpeg"
                         alt="Men's Collection"
                         fill
                         className="object-cover object-center"
@@ -52,9 +52,9 @@ export default function OurCollection() {
                                 <div>
                                     <p className="t14 text-[14px]! mb-0.5!">Pricing start from:</p>
                                     <div className="flex items-center gap-2">
-                                        <p className="t16 mb-0! text-black! font-[520]">₹45.00</p>
+                                        <p className="t16 mb-0! text-black! font-[520]">₹599</p>
                                         <span className="text-black/40 text-sm">—</span>
-                                        <p className="t16 mb-0! text-black! font-[520]">₹180.00</p>
+                                        <p className="t16 mb-0! text-black! font-[520]">₹999</p>
                                     </div>
                                 </div>
                             </div>

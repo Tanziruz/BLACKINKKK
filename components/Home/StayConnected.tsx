@@ -15,13 +15,14 @@ export default function StayConnected() {
 
                 <StaggerItem>
                     <h2 className="text-[40px]! sm:text-[48px]! mb-0! text-center px-4">
-                        See our community<br />in modern silhouettes
+                        See our fashion and designs 
+<br />in modern street wear vibes
                     </h2>
                 </StaggerItem>
 
                 <StaggerItem>
                     <p className="t16 mb-0! text-center max-w-105 px-6">
-                        Connect with us on social media for a daily dose of fresh style, featuring exclusive looks from our community.
+Connect with us on social media for a daily dose of fresh styles, featuring exclusive looks from our designers and fashion gurus.
                     </p>
                 </StaggerItem>
 

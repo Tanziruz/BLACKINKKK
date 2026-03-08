@@ -1,6 +1,7 @@
 import StayConnected from "@/components/Home/StayConnected";
 import TopPage from "@/components/TopPage";
 import OurStory from "@/components/about/OurStory";
+import TeamSection from "@/components/about/TeamSection";
 
 export default function About() {
     return (
@@ -9,15 +10,16 @@ export default function About() {
                 <TopPage 
                     imageSrc="/About.png"
                     imageAlt="About Us Image"
-                    tagTitle="Know About BLACKINKKK"
+                    tagTitle="Know About Us"
                     title="Timeless design, modern wearability"
                     description="We focus on creating essential garments that remain relevant, functional, and refined across seasons."
                     button1Text="Our Story"
                     button1Link="/products"
                     button2Text="Our Team"
-                    button2Link="/contact"
+                    button2Link="/team"
                 />
             </div>
+            <TeamSection />
             <OurStory />
             <StayConnected />
         </section>

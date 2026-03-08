@@ -11,7 +11,7 @@ export default function About() {
                     imageAlt="About Us Image"
                     tagTitle="Here to help you"
                     title="Helping you define your personal style"
-                    description="Contact us today for refined service designed for our discerning Wearix fashion community."
+                    description="Contact us today for refined service from our creative design team."
                     button1Text="Browse Collections"
                     button1Link="/products"
                     button2Text="About Us"

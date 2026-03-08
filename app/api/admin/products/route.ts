@@ -48,10 +48,20 @@ export async function POST(request: Request) {
         const body = await request.json();
 
         // Validate minimum required fields
-        if (!body.title || body.price == null) {
+        if (!body.id || !body.title || body.price == null) {
             return NextResponse.json(
-                { error: "title and price are required." },
+                { error: "SKU code, title, and price are required." },
                 { status: 400 }
+            );
+        }
+
+        // Check for duplicate SKU
+        const col = await collection();
+        const existing = await col.findOne({ id: body.id });
+        if (existing) {
+            return NextResponse.json(
+                { error: "A product with this SKU code already exists." },
+                { status: 409 }
             );
         }
 
@@ -67,7 +77,7 @@ export async function POST(request: Request) {
         const sizeStocks: SizeStock[] = body.sizeStocks ?? [];
 
         const newProduct: Product = {
-            id: `prod-${Date.now()}`,
+            id: body.id,
             title: body.title,
             price: Number(body.price),
             originalPrice: Number(body.originalPrice ?? body.price),
@@ -84,7 +94,6 @@ export async function POST(request: Request) {
             sizeStocks,
         };
 
-        const col = await collection();
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         await (col as any).insertOne(newProduct);
 

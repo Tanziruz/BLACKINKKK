@@ -34,9 +34,9 @@ export async function PUT(
         const { id } = await params;
         const body = await request.json();
 
-        // Disallow changing the id via body
+        // Extract new SKU (id) if provided, strip Mongo _id
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        const { id: _id, _id: __id, ...update } = body;
+        const { id: newId, _id: __id, ...update } = body;
 
         // Recompute total stock if variant data is present
         if (update.colors || update.sizeStocks) {
@@ -49,6 +49,20 @@ export async function PUT(
 
         const client = await clientPromise;
         const col = client.db(DB).collection<Product>(COLLECTION);
+
+        // If the SKU is being changed, check for duplicates
+        const skuChanged = newId && newId !== id;
+        if (skuChanged) {
+            const dup = await col.findOne({ id: newId });
+            if (dup) {
+                return NextResponse.json(
+                    { error: "A product with this SKU code already exists." },
+                    { status: 409 }
+                );
+            }
+            update.id = newId;
+        }
+
         const result = await col.findOneAndUpdate(
             { id },
             { $set: update },
@@ -62,6 +76,7 @@ export async function PUT(
         revalidatePath("/");
         revalidatePath("/products");
         revalidatePath(`/products/${id}`);
+        if (skuChanged) revalidatePath(`/products/${newId}`);
 
         return NextResponse.json(result);
     } catch (err) {

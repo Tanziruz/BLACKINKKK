@@ -16,7 +16,7 @@ export default function Products() {
                     imageAlt="Products Image"
                     tagTitle="The New Season"
                     title="Elevate your daily wardrobe with ease"
-                    description="Explore our handpicked modern silhouettes crafted from the world's most sustainable fabrics."
+                    description="Explore our handpicked modern unisex oversized t-shirts crafted from the world's most sustainable fabrics."
                     button1Text="Contact Us"
                     button1Link="/contact"
                     button2Text="About Us"

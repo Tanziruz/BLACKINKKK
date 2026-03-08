@@ -68,7 +68,8 @@ export default function Footer() {
                                 <MapPin size={16} className="text-white-60 shrink-0 mt-0.75" />
                                 <p className="t16 text-white-60 text-left!">
                                     Ghaziabad,<br />
-                                    Uttar Pradesh<br />
+                                    Uttar Pradesh,<br />
+                                    India <br/> 
                                     201001
                                 </p>
                             </div>
