@@ -3,7 +3,6 @@ import { notFound } from "next/navigation";
 import ProductDetail from "@/components/ProductDetail";
 import type { Metadata } from "next";
 
-// Always render dynamically so deleted products don't linger
 export const dynamic = "force-dynamic";
 
 interface Props {

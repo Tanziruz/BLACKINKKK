@@ -331,7 +331,7 @@ const FEATURES = [
     {
         icon: CreditCard,
         title: "Secure Payments",
-        desc: "Shop confidently with our secure, encrypted checkout.",
+        desc: "Payment by UPI only / COD not available.",
     },
     {
         icon: RotateCcw,
@@ -347,6 +347,7 @@ export default function ProductDetail({ product }: Props) {
     const [activeColorIndex, setActiveColorIndex] = useState(0);
     const [selectedSize, setSelectedSize] = useState<string | null>(null);
     const [showContact, setShowContact] = useState(false);
+    const [showReturnPolicy, setShowReturnPolicy] = useState(false);
 
     const currentImageMain = (hasColors
         ? product.colors![activeColorIndex].image_main
@@ -570,9 +571,55 @@ export default function ProductDetail({ product }: Props) {
                             </p>
                             <p className="font-Inter text-[12px] md:text-[13px] text-gray tracking-[-0.01em] leading-[1.55em]">
                                 {feature.desc}
+                                {feature.title === "Easy Returns" && (
+                                    <>
+                                        {" "}
+                                        <button
+                                            onClick={() => setShowReturnPolicy(true)}
+                                            className="underline underline-offset-2 text-black/70 hover:text-black transition-colors cursor-pointer"
+                                        >
+                                            Check our return policy
+                                        </button>
+                                    </>
+                                )}
                             </p>
                         </StaggerItem>
                     ))}
+
+                    {/* Return Policy Dialog */}
+                    <Dialog open={showReturnPolicy} onOpenChange={setShowReturnPolicy}>
+                        <DialogContent className="max-w-lg">
+                            <DialogHeader>
+                                <DialogTitle className="font-Ronzino-Medium text-[20px] tracking-[-0.02em]">
+                                    Return &amp; Refund Policy
+                                </DialogTitle>
+                                <DialogDescription className="sr-only">
+                                    BLACKINKKK return and refund policy details
+                                </DialogDescription>
+                            </DialogHeader>
+
+                            <div className="flex flex-col gap-5 pt-1">
+                                {/* Returns policy detail */}
+                                <div className="flex flex-col gap-2">
+                                    <p className="font-Ronzino-Medium text-[14px] tracking-[-0.01em] mb-0!">Returns Policy</p>
+                                    <div className="flex flex-col gap-2">
+                                        <div className="flex items-center gap-2.5">
+                                            <span className="shrink-0 w-1.5 h-1.5 rounded-full bg-black/35" />
+                                            <p className="font-Inter text-[13px] text-black/70 leading-[1.6em] mb-0!">Goods once sold cannot be exchanged.</p>
+                                        </div>
+                                        <div className="flex items-center gap-2.5">
+                                            <span className="shrink-0 w-1.5 h-1.5 rounded-full bg-black/35" />
+                                            <p className="font-Inter text-[13px] text-black/70 leading-[1.6em] mb-0!">Goods return possible with refund in 4–7 working days.</p>
+                                        </div>
+                                        <div className="flex items-center gap-2.5">
+                                            <span className="shrink-0 w-1.5 h-1.5 rounded-full bg-black/35" />
+                                            <p className="font-Inter text-[13px] text-black/70 leading-[1.6em] mb-0!">Email required for return goods pick up.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </DialogContent>
+                    </Dialog>
                 </Stagger>
             </section>
         </div>

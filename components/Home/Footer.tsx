@@ -39,7 +39,6 @@ export default function Footer() {
                             <FooterLink title="Home" href="/" />
                             <FooterLink title="About" href="/about" />
                             <FooterLink title="Shop" href="/shop" />
-                            <FooterLink title="Reviews" href="/reviews" />
                         </div>
 
                         <div className="flex flex-col items-start">
@@ -55,6 +54,11 @@ export default function Footer() {
                             <div className="flex items-center gap-3">
                                 <Mail size={16} className="text-white-60 shrink-0" />
                                 <p className="t16 text-white-60 text-left!">Blackinkkk@aol.com</p>
+                            </div>
+
+                            <div className="flex items-center gap-3">
+                                <Mail size={16} className="text-white-60 shrink-0" />
+                                <p className="t16 text-white-60 text-left!">info_blackinkkk@aol.com</p>
                             </div>
 
                             <div className="flex items-center gap-3">
