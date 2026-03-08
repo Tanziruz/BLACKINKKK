@@ -1,25 +1,32 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import {
     Globe2,
     Scissors,
-    BadgeCheck,
     ShieldCheck,
     MapPin,
     CreditCard,
     RotateCcw,
     Mail,
     PhoneCall,
+    Ruler,
     X,
 } from "lucide-react";
 import type { Product } from "@/types/product";
 import ProductCardTag from "./Buttons_And_Links/ProductCardTag";
 import BestSellerTag from "./Buttons_And_Links/BestSellerTag";
 import { Stagger, StaggerItem } from "./Animate";
+import {
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+    DialogDescription,
+} from "@/components/ui/dialog";
 
 function WhatsAppIcon() {
     return (
@@ -34,6 +41,7 @@ const CONTACT_EMAIL    = "Blackinkkk@aol.com"; // replace with real email
 const CONTACT_PHONE    = "+919810367883"; // replace with real phone
 
 const E = [0.22, 1, 0.36, 1] as const;
+const PLACEHOLDER = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1' height='1'/%3E";
 function entry(delay = 0) {
     return {
         initial: { opacity: 0, y: 18 },
@@ -159,6 +167,152 @@ function ContactSheet({ productTitle, onClose }: { productTitle: string; onClose
 }
 // ─────────────────────────────────────────────────────────────────────────────
 
+// ─────────────────────────────────────────────────────────────────────────────
+// Size Selector (controlled)
+// ─────────────────────────────────────────────────────────────────────────────
+function SizeSelector({
+    sizes,
+    selectedSize,
+    onSizeChange,
+    variantStock,
+}: {
+    sizes: string[];
+    selectedSize: string | null;
+    onSizeChange: (size: string | null) => void;
+    variantStock?: number;
+}) {
+    const [showChart, setShowChart] = useState(false);
+
+    return (
+        <motion.div {...entry(0.40)} className="mb-5">
+            <div className="flex items-center justify-between mb-2.5">
+                <p className="font-Inter text-[13px] text-black">
+                    <span className="font-medium">Size</span>
+                    {selectedSize && (
+                        <span className="text-gray ml-2">
+                            {selectedSize}
+                            {variantStock != null && (
+                                <span className="ml-1.5 text-[11px]">
+                                    ({variantStock} in stock)
+                                </span>
+                            )}
+                        </span>
+                    )}
+                </p>
+                <button
+                    type="button"
+                    onClick={() => setShowChart(true)}
+                    className="font-Inter text-[12px] text-black/50 underline underline-offset-2 hover:text-black transition-colors cursor-pointer"
+                >
+                    Size Chart
+                </button>
+            </div>
+            <div className="flex flex-wrap items-center gap-2">
+                {sizes.map((size) => {
+                    const isSelected = size === selectedSize;
+                    return (
+                        <button
+                            key={size}
+                            onClick={() => onSizeChange(isSelected ? null : size)}
+                            className={`min-w-11 h-11 px-3 rounded-xl font-Inter text-[13px] font-medium tracking-[-0.01em] border transition-all duration-200 cursor-pointer ${
+                                isSelected
+                                    ? "bg-black text-white border-black"
+                                    : "bg-white text-black border-black/15 hover:border-black/50"
+                            }`}
+                        >
+                            {size}
+                        </button>
+                    );
+                })}
+            </div>
+
+            {/* Size Chart Dialog */}
+            <Dialog open={showChart} onOpenChange={setShowChart}>
+                <DialogContent className="sm:max-w-2xl bg-white p-0 gap-0 rounded-2xl overflow-hidden border-none">
+                    <DialogHeader className="px-5 pt-5 pb-0">
+                        <div className="flex items-center gap-3">
+                            <div className="w-8 h-8 rounded-lg bg-black flex items-center justify-center shrink-0">
+                                <Ruler className="w-4 h-4 text-white" strokeWidth={1.75} />
+                            </div>
+                            <div>
+                                <DialogTitle className="font-Ronzino-Medium text-black text-[15px] tracking-[-0.02em] leading-none mb-0.5">
+                                    Size Chart
+                                </DialogTitle>
+                                <DialogDescription className="font-Inter text-[11px] text-gray tracking-[-0.01em]">
+                                    Find your perfect fit — measurements in inches &amp; centimeters
+                                </DialogDescription>
+                            </div>
+                        </div>
+                    </DialogHeader>
+
+                    <div className="overflow-x-auto px-5 pb-5 pt-4">
+                        <table className="w-full text-left border-collapse min-w-120">
+                            <thead>
+                                <tr className="bg-black/4">
+                                    <th rowSpan={2} className="px-5 py-3 font-Inter text-[11px] font-semibold text-black/60 tracking-[0.08em] uppercase border-b border-r border-black/8 align-middle whitespace-nowrap">
+                                        Size
+                                    </th>
+                                    <th colSpan={2} className="px-5 py-2 font-Inter text-[11px] font-semibold text-black/60 tracking-[0.08em] uppercase border-b border-r border-black/8 text-center">
+                                        Chest
+                                    </th>
+                                    <th colSpan={2} className="px-5 py-2 font-Inter text-[11px] font-semibold text-black/60 tracking-[0.08em] uppercase border-b border-r border-black/8 text-center">
+                                        Body Length
+                                    </th>
+                                    <th colSpan={2} className="px-5 py-2 font-Inter text-[11px] font-semibold text-black/60 tracking-[0.08em] uppercase border-b border-black/8 text-center">
+                                        Sleeve Length
+                                    </th>
+                                </tr>
+                                <tr className="bg-black/4">
+                                    {["Inch", "Cm", "Inch", "Cm", "Inch", "Cm"].map((label, i) => (
+                                        <th
+                                            key={i}
+                                            className={`px-4 py-2 font-Inter text-[11px] font-medium text-black/50 tracking-[-0.01em] italic border-b border-black/8 text-center ${i !== 5 ? "border-r" : ""}`}
+                                        >
+                                            {label}
+                                        </th>
+                                    ))}
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {SIZE_CHART_ROWS.map((row, idx) => (
+                                    <tr
+                                        key={row.size}
+                                        className={idx % 2 === 0 ? "bg-white" : "bg-[#F4F4F4]/60"}
+                                    >
+                                        <td className="px-5 py-3.5 font-Ronzino-Medium text-black text-[14px] tracking-[-0.02em] border-r border-black/8 italic whitespace-nowrap">
+                                            {row.size}
+                                        </td>
+                                        {[row.chestIn, row.chestCm, row.bodyIn, row.bodyCm, row.sleeveIn, row.sleeveCm].map((val, i) => (
+                                            <td
+                                                key={i}
+                                                className={`px-4 py-3.5 font-Inter text-[13px] text-black/75 text-center ${i !== 5 ? "border-r border-black/8" : ""}`}
+                                            >
+                                                {val}
+                                            </td>
+                                        ))}
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                </DialogContent>
+            </Dialog>
+        </motion.div>
+    );
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Size Chart
+// ─────────────────────────────────────────────────────────────────────────────
+const SIZE_CHART_ROWS = [
+    { size: "Small",  chestIn: 40, chestCm: 102, bodyIn: 27, bodyCm: 69,  sleeveIn: 8.5, sleeveCm: 22 },
+    { size: "Medium", chestIn: 42, chestCm: 107, bodyIn: 28, bodyCm: 72,  sleeveIn: 9,   sleeveCm: 23 },
+    { size: "Large",  chestIn: 44, chestCm: 112, bodyIn: 29, bodyCm: 74,  sleeveIn: 9.5, sleeveCm: 24 },
+    { size: "XL",     chestIn: 47, chestCm: 120, bodyIn: 30, bodyCm: 76,  sleeveIn: 10,  sleeveCm: 25 },
+];
+
+// ─────────────────────────────────────────────────────────────────────────────
+
 interface Props {
     product: Product;
 }
@@ -188,17 +342,33 @@ const FEATURES = [
 
 export default function ProductDetail({ product }: Props) {
     const hasColors = !!(product.colors && product.colors.length > 0);
+    const hasSizes = !!(product.sizes && product.sizes.length > 0);
 
     const [activeColorIndex, setActiveColorIndex] = useState(0);
+    const [selectedSize, setSelectedSize] = useState<string | null>(null);
     const [showContact, setShowContact] = useState(false);
 
-    const currentImageMain = hasColors
+    const currentImageMain = (hasColors
         ? product.colors![activeColorIndex].image_main
-        : product.image_main;
+        : product.image_main) || PLACEHOLDER;
 
     const thumbnails = hasColors
         ? product.colors!.map((c) => ({ src: c.image_main, label: c.name }))
         : [];
+
+    // Compute stock for the currently selected color + size combination
+    const currentStock = useMemo(() => {
+        if (hasColors && selectedSize) {
+            const color = product.colors[activeColorIndex];
+            const ss = (color.sizeStocks ?? []).find((s) => s.size === selectedSize);
+            return ss?.stock ?? 0;
+        }
+        if (selectedSize && product.sizeStocks) {
+            const ss = product.sizeStocks.find((s) => s.size === selectedSize);
+            return ss?.stock ?? 0;
+        }
+        return product.stock;
+    }, [activeColorIndex, selectedSize, product, hasColors]);
 
     return (
         <div className="w-full bg-bg pt-10">
@@ -239,7 +409,7 @@ export default function ProductDetail({ product }: Props) {
                                             }`}
                                         >
                                             <Image
-                                                src={thumb.src}
+                                                src={thumb.src || PLACEHOLDER}
                                                 alt={thumb.label}
                                                 fill
                                                 className="object-cover object-center"
@@ -272,11 +442,11 @@ export default function ProductDetail({ product }: Props) {
 
                         <motion.div {...entry(0.26)} className="flex items-baseline gap-3 mb-5">
                             <span className="font-Ronzino-Medium text-black text-[22px] md:text-[26px] tracking-[-0.03em] leading-[1.4em]">
-                                USD ${product.price.toFixed(2)}
+                                ₹{product.price.toFixed(2)}
                             </span>
                             {product.originalPrice && (
                                 <span className="font-Ronzino-Medium text-gray-2 text-[15px] md:text-[16px] tracking-[-0.035em] leading-[1.5em] line-through">
-                                    USD ${product.originalPrice.toFixed(2)}
+                                    ₹{product.originalPrice.toFixed(2)}
                                 </span>
                             )}
                         </motion.div>
@@ -314,26 +484,36 @@ export default function ProductDetail({ product }: Props) {
                             </motion.div>
                         )}
 
+                        {/* Size selector */}
+                        {hasSizes && (
+                            <SizeSelector
+                                sizes={product.sizes!}
+                                selectedSize={selectedSize}
+                                onSizeChange={setSelectedSize}
+                                variantStock={selectedSize != null ? currentStock : undefined}
+                            />
+                        )}
+
                         <motion.div {...entry(0.46)} className="mb-6">
                             <p className="font-Inter text-[13px] font-medium text-black/50">
-                                {product.stock} in stock
+                                {currentStock} in stock
                             </p>
                         </motion.div>
 
                         <motion.button
                             {...entry(0.54)}
-                            onClick={() => product.stock !== 0 && setShowContact(true)}
+                            onClick={() => currentStock !== 0 && setShowContact(true)}
                             className={`btn-anim justify-center w-full bg-black text-white text-center font-Inter text-[15px] md:text-[16px] tracking-[-0.02em] leading-[1.5em] py-4 rounded-full hover:bg-black/85 active:scale-[0.99] transition-all duration-200 mb-7 cursor-pointer ${
-                                product.stock === 0 ? "opacity-50 pointer-events-none" : ""
+                                currentStock === 0 ? "opacity-50 pointer-events-none" : ""
                             }`}
-                            disabled={product.stock === 0}
+                            disabled={currentStock === 0}
                         >
                             <span className="btn-label">
                                 <span className="btn-label-primary">
-                                    {product.stock === 0 ? "Sold Out" : "Order Now"}
+                                    {currentStock === 0 ? "Sold Out" : "Order Now"}
                                 </span>
                                 <span className="btn-label-secondary">
-                                    {product.stock === 0 ? "Sold Out" : "Order Now"}
+                                    {currentStock === 0 ? "Sold Out" : "Order Now"}
                                 </span>
                             </span>
                         </motion.button>
@@ -360,7 +540,7 @@ export default function ProductDetail({ product }: Props) {
                                     </div>
                                 </div>
 
-                                <div className="flex items-start gap-3.5 py-4 border-b border-black/10">
+                                <div className="flex items-start gap-3.5 py-4">
                                     <Scissors className="w-4.5 h-4.5 text-black mt-0.5 shrink-0" strokeWidth={1.5} />
                                     <div className="flex-1 flex flex-col sm:flex-row sm:justify-between sm:gap-4">
                                         <span className="font-Inter text-[13px] md:text-[14px] text-black font-medium leading-[1.5em] shrink-0">
@@ -368,18 +548,6 @@ export default function ProductDetail({ product }: Props) {
                                         </span>
                                         <span className="font-Inter text-[13px] md:text-[14px] text-gray leading-[1.5em] sm:text-right">
                                             {product.details.care}
-                                        </span>
-                                    </div>
-                                </div>
-
-                                <div className="flex items-start gap-3.5 py-4">
-                                    <BadgeCheck className="w-4.5 h-4.5 text-black mt-0.5 shrink-0" strokeWidth={1.5} />
-                                    <div className="flex-1 flex flex-col sm:flex-row sm:justify-between sm:gap-4">
-                                        <span className="font-Inter text-[13px] md:text-[14px] text-black font-medium leading-[1.5em] shrink-0">
-                                            Warranty
-                                        </span>
-                                        <span className="font-Inter text-[13px] md:text-[14px] text-gray leading-[1.5em] sm:text-right">
-                                            {product.details.warranty}
                                         </span>
                                     </div>
                                 </div>

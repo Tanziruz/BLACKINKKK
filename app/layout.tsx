@@ -1,4 +1,3 @@
-import { Analytics } from "@vercel/analytics/next"
 import type { Metadata } from "next";
 import "./globals.css";
 import NavWrapper from "@/components/NavWrapper";
@@ -21,7 +20,6 @@ export default function RootLayout({
         <LayoutShell nav={<NavWrapper />} footer={<Footer />}>
           {children}
         </LayoutShell>
-        <Analytics />
       </body>
     </html>
   );

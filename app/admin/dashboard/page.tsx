@@ -3,7 +3,7 @@
 import { useEffect, useState, useCallback } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import type { Product, ProductColor, ProductTag } from "@/types/product";
+import type { Product, ProductTag } from "@/types/product";
 import ImageDropZone from "./ImageDropZone";
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -14,7 +14,11 @@ interface ColorDraft {
     hex: string;
     image_main: string;
     image_hover: string;
+    sizeStocks: Record<string, number>;
 }
+
+const ALL_SIZES = ["XS", "S", "M", "L", "XL", "XXL"] as const;
+type Size = (typeof ALL_SIZES)[number];
 
 interface ProductDraft {
     title: string;
@@ -29,8 +33,9 @@ interface ProductDraft {
     image_hover: string;
     material: string;
     care: string;
-    warranty: string;
+    sizes: Size[];
     colors: ColorDraft[];
+    sizeStocks: Record<string, number>;
 }
 
 const EMPTY_DRAFT: ProductDraft = {
@@ -46,8 +51,9 @@ const EMPTY_DRAFT: ProductDraft = {
     image_hover: "",
     material: "",
     care: "",
-    warranty: "",
+    sizes: [],
     colors: [],
+    sizeStocks: {},
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -122,12 +128,18 @@ function productToDraft(p: Product): ProductDraft {
         image_hover: p.image_hover,
         material: p.details?.material ?? "",
         care: p.details?.care ?? "",
-        warranty: p.details?.warranty ?? "",
+        sizes: (p.sizes ?? []) as Size[],
+        sizeStocks: Object.fromEntries(
+            (p.sizeStocks ?? []).map((s) => [s.size, s.stock])
+        ),
         colors: p.colors.map((c) => ({
             name: c.name,
             hex: c.hex,
             image_main: c.image_main,
             image_hover: "",
+            sizeStocks: Object.fromEntries(
+                (c.sizeStocks ?? []).map((s) => [s.size, s.stock])
+            ),
         })),
     };
 }
@@ -193,10 +205,10 @@ function AdminProductCard({
                 </p>
                 <p className="text-white/40 text-xs">{product.category}</p>
                 <div className="flex items-baseline gap-2 mt-auto pt-2">
-                    <span className="text-white text-sm font-semibold">${product.price}</span>
+                    <span className="text-white text-sm font-semibold">₹{product.price}</span>
                     {product.originalPrice > product.price && (
                         <span className="text-white/30 text-xs line-through">
-                            ${product.originalPrice}
+                            ₹{product.originalPrice}
                         </span>
                     )}
                     <span className="ml-auto text-white/30 text-xs">{product.stock} in stock</span>
@@ -247,16 +259,25 @@ function AdminProductCard({
 function ColorRow({
     color,
     index,
+    sizes,
     onChange,
     onRemove,
 }: {
     color: ColorDraft;
     index: number;
+    sizes: Size[];
     onChange: (index: number, updated: ColorDraft) => void;
     onRemove: (index: number) => void;
 }) {
     function set(key: keyof ColorDraft, value: string) {
         onChange(index, { ...color, [key]: value });
+    }
+
+    function setSizeStock(size: string, stock: number) {
+        onChange(index, {
+            ...color,
+            sizeStocks: { ...color.sizeStocks, [size]: stock },
+        });
     }
 
     return (
@@ -295,6 +316,30 @@ function ColorRow({
                 <ImageDropZone label="Main image" value={color.image_main} onChange={(v) => set("image_main", v)} />
                 <ImageDropZone label="Hover image" value={color.image_hover} onChange={(v) => set("image_hover", v)} />
             </div>
+            {/* Per-size stock inputs */}
+            {sizes.length > 0 && (
+                <div className="flex flex-col gap-2 pt-1">
+                    <span className="text-white/40 text-[10px] uppercase tracking-widest">
+                        Stock per size
+                    </span>
+                    <div className="grid grid-cols-3 gap-2">
+                        {sizes.map((size) => (
+                            <div key={size} className="flex items-center gap-2">
+                                <span className="text-white/50 text-xs w-7 shrink-0">{size}</span>
+                                <input
+                                    type="number"
+                                    min={0}
+                                    value={color.sizeStocks[size] ?? 0}
+                                    onChange={(e) =>
+                                        setSizeStock(size, Math.max(0, Number(e.target.value) || 0))
+                                    }
+                                    className="bg-white/5 border border-white/15 text-white rounded-none px-2 py-1.5 text-xs outline-none focus:border-white/50 transition-colors w-full"
+                                />
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            )}
         </div>
     );
 }
@@ -322,10 +367,55 @@ function AddProductModal({
         setDraft((d) => ({ ...d, [key]: value }));
     }
 
+    function toggleSize(size: Size) {
+        setDraft((prev) => {
+            const active = prev.sizes.includes(size);
+            const newSizes = active
+                ? prev.sizes.filter((s) => s !== size)
+                : [...prev.sizes, size];
+
+            // sync color sizeStocks
+            const newColors = prev.colors.map((c) => {
+                const s = { ...c.sizeStocks };
+                if (active) delete s[size];
+                else if (!(size in s)) s[size] = 0;
+                return { ...c, sizeStocks: s };
+            });
+
+            // sync product-level sizeStocks
+            const newSS = { ...prev.sizeStocks };
+            if (active) delete newSS[size];
+            else if (!(size in newSS)) newSS[size] = 0;
+
+            return { ...prev, sizes: newSizes, colors: newColors, sizeStocks: newSS };
+        });
+    }
+
+    // compute total stock for display
+    const hasSizes = draft.sizes.length > 0;
+    const hasColors = draft.colors.length > 0;
+    const totalStock = (() => {
+        if (hasSizes && hasColors) {
+            return draft.colors.reduce(
+                (sum, c) =>
+                    sum + Object.values(c.sizeStocks).reduce((a, b) => a + b, 0),
+                0
+            );
+        }
+        if (hasSizes) {
+            return Object.values(draft.sizeStocks).reduce((a, b) => a + b, 0);
+        }
+        return Number(draft.stock || 0);
+    })();
+
     function addColor() {
+        const initialSizeStocks: Record<string, number> = {};
+        draft.sizes.forEach((size) => {
+            initialSizeStocks[size] = 0;
+        });
         set("colors", [
             ...draft.colors,
-            { name: "", hex: "#000000", image_main: "", image_hover: "" },
+            { name: "", hex: "#000000", image_main: "", image_hover: "", sizeStocks: initialSizeStocks },
         ]);
     }
 
@@ -348,12 +438,33 @@ function AddProductModal({
         setError("");
         setSaving(true);
         try {
+            const colors = draft.colors
+                .filter((c) => c.name.trim())
+                .map((c) => ({
+                    name: c.name,
+                    hex: c.hex,
+                    image_main: c.image_main,
+                    image_hover: c.image_hover || c.image_main,
+                    sizeStocks: draft.sizes.map((size) => ({
+                        size,
+                        stock: c.sizeStocks[size] ?? 0,
+                    })),
+                }));
+
+            const sizeStocks =
+                draft.sizes.length > 0 && colors.length === 0
+                    ? draft.sizes.map((size) => ({
+                          size,
+                          stock: draft.sizeStocks[size] ?? 0,
+                      }))
+                    : [];
+
             const body = {
                 title: draft.title.trim(),
                 price: Number(draft.price),
                 originalPrice: Number(draft.originalPrice),
                 category: draft.category.trim(),
-                stock: Number(draft.stock || 0),
+                stock: totalStock,
                 description: draft.description.trim(),
                 tag: draft.tag,
                 includeHome: draft.includeHome,
@@ -362,16 +473,10 @@ function AddProductModal({
                 details: {
                     material: draft.material.trim(),
                     care: draft.care.trim(),
-                    warranty: draft.warranty.trim(),
                 },
-                colors: draft.colors
-                    .filter((c) => c.name.trim())
-                    .map((c) => ({
-                        name: c.name,
-                        hex: c.hex,
-                        image_main: c.image_main,
-                        image_hover: c.image_hover || c.image_main,
-                    })) as ProductColor[],
+                sizes: draft.sizes,
+                colors,
+                sizeStocks,
             };
 
             const url = isEdit
@@ -453,8 +558,14 @@ function AddProductModal({
                                 <TextInput value={draft.category} onChange={(v) => set("category", v)} placeholder="e.g. Outerwear" />
                             </div>
                             <div className="flex flex-col gap-1.5">
-                                <FieldLabel>Stock</FieldLabel>
-                                <TextInput type="number" value={draft.stock} onChange={(v) => set("stock", v)} placeholder="0" />
+                                <FieldLabel>{hasSizes ? "Total Stock" : "Stock"}</FieldLabel>
+                                {hasSizes ? (
+                                    <div className="bg-white/5 border border-white/15 text-white/50 rounded-none px-3 py-2.5 text-sm">
+                                        {totalStock} (auto-calculated)
+                                    </div>
+                                ) : (
+                                    <TextInput type="number" value={draft.stock} onChange={(v) => set("stock", v)} placeholder="0" />
+                                )}
                             </div>
                         </div>
                         <div className="grid grid-cols-2 gap-3">
@@ -501,11 +612,62 @@ function AddProductModal({
                             <FieldLabel>Care instructions</FieldLabel>
                             <TextInput value={draft.care} onChange={(v) => set("care", v)} placeholder="e.g. Dry clean only" />
                         </div>
-                        <div className="flex flex-col gap-1.5">
-                            <FieldLabel>Warranty</FieldLabel>
-                            <TextInput value={draft.warranty} onChange={(v) => set("warranty", v)} placeholder="e.g. One year full quality guarantee" />
+                    </section>
+
+                    <Divider />
+
+                    {/* ── SIZES ── */}
+                    <section className="flex flex-col gap-4">
+                        <SectionHeading>Available Sizes</SectionHeading>
+                        <div className="flex flex-wrap gap-2">
+                            {ALL_SIZES.map((size) => {
+                                const active = draft.sizes.includes(size);
+                                return (
+                                    <button
+                                        key={size}
+                                        type="button"
+                                        onClick={() => toggleSize(size)}
+                                        className={`px-4 py-2 text-xs tracking-widest uppercase border transition-colors ${
+                                            active
+                                                ? "bg-white text-black border-white"
+                                                : "bg-transparent text-white/40 border-white/15 hover:border-white/40 hover:text-white/70"
+                                        }`}
+                                    >
+                                        {size}
+                                    </button>
+                                );
+                            })}
                         </div>
                     </section>
+
+                    {/* ── STOCK PER SIZE (only when sizes exist but no color variants) ── */}
+                    {hasSizes && !hasColors && (
+                        <>
+                            <Divider />
+                            <section className="flex flex-col gap-4">
+                                <SectionHeading>Stock per Size</SectionHeading>
+                                <div className="grid grid-cols-3 gap-2">
+                                    {draft.sizes.map((size) => (
+                                        <div key={size} className="flex items-center gap-2">
+                                            <span className="text-white/50 text-xs w-7 shrink-0">{size}</span>
+                                            <input
+                                                type="number"
+                                                min={0}
+                                                value={draft.sizeStocks[size] ?? 0}
+                                                onChange={(e) =>
+                                                    set("sizeStocks", {
+                                                        ...draft.sizeStocks,
+                                                        [size]: Math.max(0, Number(e.target.value) || 0),
+                                                    })
+                                                }
+                                                className="bg-white/5 border border-white/15 text-white rounded-none px-2 py-1.5 text-xs outline-none focus:border-white/50 transition-colors w-full"
+                                            />
+                                        </div>
+                                    ))}
+                                </div>
+                            </section>
+                        </>
+                    )}
 
                     <Divider />
 
@@ -544,6 +706,7 @@ function AddProductModal({
                                 key={i}
                                 color={color}
                                 index={i}
+                                sizes={draft.sizes}
                                 onChange={updateColor}
                                 onRemove={removeColor}
                             />
