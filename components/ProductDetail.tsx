@@ -336,7 +336,7 @@ const FEATURES = [
     {
         icon: RotateCcw,
         title: "Easy Returns",
-        desc: "Change your mind? Return any item easily within thirty days.",
+        desc: "Change your mind? Return any item easily within seven days.",
     },
 ];
 

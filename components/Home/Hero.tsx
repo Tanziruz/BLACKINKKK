@@ -11,6 +11,7 @@ const thumbnails = [
   { src: "/Img3.png", label: "Navy Blue" },
   { src: "/Img4.png", label: "Off White" },
   { src: "/Img5.png", label: "Black" },
+  {src: "/Img6.jpeg", label: "Maroon" },
 ];
 
 export default function Hero() {

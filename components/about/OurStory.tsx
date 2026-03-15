@@ -5,13 +5,13 @@ import { FadeUp } from "../Animate";
 
 export default function OurStory() {
     return (
-        <section className="px-6 sm:px-10 lg:px-16 py-12 sm:py-16 lg:py-20 flex flex-col items-center gap-6 -mt-5">
+        <section id="our-story" className="px-6 sm:px-10 lg:px-16 py-12 sm:py-16 lg:py-20 flex flex-col items-center gap-6 -mt-5 scroll-mt-28">
 
            <FadeUp distance={16}>
                <SectionTag icon={Info} title="About BLACKINKKK" />
            </FadeUp>
            <FadeUp delay={0.08}>
-               <h5 className="text-[32px]! md:text-[32px]! lg:text-[32px]! mb-0! text-center">
+               <h5 className="text-[32px]! md:text-[32px]! lg:text-[32px]! mb-0! text-center uppercase">
                    Our Story
                </h5>
            </FadeUp>

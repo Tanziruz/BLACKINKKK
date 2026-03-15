@@ -28,13 +28,6 @@ const SORT_LABELS: Record<SortOption, string> = {
     "price-desc": "Price: High to Low",
 };
 
-const PRICE_RANGES = [
-    { label: "All", min: 0, max: Infinity },
-    { label: "Under $75", min: 0, max: 74.99 },
-    { label: "$75 – $125", min: 75, max: 124.99 },
-    { label: "Over $125", min: 125, max: Infinity },
-] as const;
-
 /* ─── Reusable pill button ─── */
 function Pill({
     active,
@@ -68,19 +61,42 @@ export default function FilterableProductsGrid({ products }: { products: Product
         return ["All", ...Array.from(new Set(cats))];
     }, [products]);
 
+    const colors = useMemo(() => {
+        const colorNames = products.flatMap((p) => (p.colors ?? []).map((c) => c.name).filter(Boolean));
+        return ["All", ...Array.from(new Set(colorNames))];
+    }, [products]);
+
+    const sizes = useMemo(() => {
+        const directSizes = products.flatMap((p) => p.sizes ?? []);
+        const sizeStocks = products.flatMap((p) => (p.sizeStocks ?? []).map((s) => s.size));
+        const colorSizeStocks = products.flatMap((p) =>
+            (p.colors ?? []).flatMap((c) => (c.sizeStocks ?? []).map((s) => s.size))
+        );
+
+        return ["All", ...Array.from(new Set([...directSizes, ...sizeStocks, ...colorSizeStocks]))];
+    }, [products]);
+
     const [activeCategory, setActiveCategory] = useState("All");
+    const [activeColor, setActiveColor] = useState("All");
+    const [activeSize, setActiveSize] = useState("All");
     const [activeTag, setActiveTag] = useState<"all" | "new" | "best-seller">("all");
-    const [activePriceIdx, setActivePriceIdx] = useState(0);
     const [inStockOnly, setInStockOnly] = useState(false);
     const [sort, setSort] = useState<SortOption>("default");
     const [filtersOpen, setFiltersOpen] = useState(false);
 
     const filtered = useMemo(() => {
-        const range = PRICE_RANGES[activePriceIdx];
         let result = products.filter((p) => {
             if (activeCategory !== "All" && p.category !== activeCategory) return false;
+            if (activeColor !== "All" && !(p.colors ?? []).some((c) => c.name === activeColor)) return false;
+            if (activeSize !== "All") {
+                const productSizes = new Set<string>([
+                    ...(p.sizes ?? []),
+                    ...(p.sizeStocks ?? []).map((s) => s.size),
+                    ...(p.colors ?? []).flatMap((c) => (c.sizeStocks ?? []).map((s) => s.size)),
+                ]);
+                if (!productSizes.has(activeSize)) return false;
+            }
             if (activeTag !== "all" && p.tag !== activeTag) return false;
-            if (p.price < range.min || p.price > range.max) return false;
             if (inStockOnly && p.stock === 0) return false;
             return true;
         });
@@ -88,19 +104,21 @@ export default function FilterableProductsGrid({ products }: { products: Product
         if (sort === "price-asc") result = [...result].sort((a, b) => a.price - b.price);
         if (sort === "price-desc") result = [...result].sort((a, b) => b.price - a.price);
         return result;
-    }, [products, activeCategory, activeTag, activePriceIdx, inStockOnly, sort]);
+    }, [products, activeCategory, activeColor, activeSize, activeTag, inStockOnly, sort]);
 
     const hasActiveFilters =
         activeCategory !== "All" ||
+        activeColor !== "All" ||
+        activeSize !== "All" ||
         activeTag !== "all" ||
-        activePriceIdx !== 0 ||
         inStockOnly ||
         sort !== "default";
 
     function resetAll() {
         setActiveCategory("All");
+        setActiveColor("All");
+        setActiveSize("All");
         setActiveTag("all");
-        setActivePriceIdx(0);
         setInStockOnly(false);
         setSort("default");
     }
@@ -212,23 +230,45 @@ export default function FilterableProductsGrid({ products }: { products: Product
                             </div>
                         </div>
 
-                        {/* Price */}
-                        <div className="flex flex-col gap-2">
-                            <span className="font-Inter text-[11px] uppercase tracking-[0.08em] text-gray font-medium">
-                                Price
-                            </span>
-                            <div className="flex flex-wrap gap-2">
-                                {PRICE_RANGES.map((range, i) => (
-                                    <Pill
-                                        key={range.label}
-                                        active={activePriceIdx === i}
-                                        onClick={() => setActivePriceIdx(i)}
-                                    >
-                                        {range.label}
-                                    </Pill>
-                                ))}
+                        {/* Color */}
+                        {colors.length > 1 && (
+                            <div className="flex flex-col gap-2">
+                                <span className="font-Inter text-[11px] uppercase tracking-[0.08em] text-gray font-medium">
+                                    Color
+                                </span>
+                                <div className="flex flex-wrap gap-2">
+                                    {colors.map((color) => (
+                                        <Pill
+                                            key={color}
+                                            active={activeColor === color}
+                                            onClick={() => setActiveColor(color)}
+                                        >
+                                            {color}
+                                        </Pill>
+                                    ))}
+                                </div>
                             </div>
-                        </div>
+                        )}
+
+                        {/* Size */}
+                        {sizes.length > 1 && (
+                            <div className="flex flex-col gap-2">
+                                <span className="font-Inter text-[11px] uppercase tracking-[0.08em] text-gray font-medium">
+                                    Size
+                                </span>
+                                <div className="flex flex-wrap gap-2">
+                                    {sizes.map((size) => (
+                                        <Pill
+                                            key={size}
+                                            active={activeSize === size}
+                                            onClick={() => setActiveSize(size)}
+                                        >
+                                            {size}
+                                        </Pill>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
 
                         {/* Stock */}
                         <div className="flex items-center gap-3">
@@ -265,21 +305,30 @@ export default function FilterableProductsGrid({ products }: { products: Product
                                 <X size={10} strokeWidth={2.5} />
                             </button>
                         )}
+                        {activeColor !== "All" && (
+                            <button
+                                onClick={() => setActiveColor("All")}
+                                className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-black/6 font-Inter text-[12px] tracking-[-0.02em] text-black hover:bg-black/10 transition-colors duration-150 cursor-pointer"
+                            >
+                                Color: {activeColor}
+                                <X size={10} strokeWidth={2.5} />
+                            </button>
+                        )}
+                        {activeSize !== "All" && (
+                            <button
+                                onClick={() => setActiveSize("All")}
+                                className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-black/6 font-Inter text-[12px] tracking-[-0.02em] text-black hover:bg-black/10 transition-colors duration-150 cursor-pointer"
+                            >
+                                Size: {activeSize}
+                                <X size={10} strokeWidth={2.5} />
+                            </button>
+                        )}
                         {activeTag !== "all" && (
                             <button
                                 onClick={() => setActiveTag("all")}
                                 className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-black/6 font-Inter text-[12px] tracking-[-0.02em] text-black hover:bg-black/10 transition-colors duration-150 cursor-pointer"
                             >
                                 {activeTag === "new" ? "New" : "Best Seller"}
-                                <X size={10} strokeWidth={2.5} />
-                            </button>
-                        )}
-                        {activePriceIdx !== 0 && (
-                            <button
-                                onClick={() => setActivePriceIdx(0)}
-                                className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-black/6 font-Inter text-[12px] tracking-[-0.02em] text-black hover:bg-black/10 transition-colors duration-150 cursor-pointer"
-                            >
-                                {PRICE_RANGES[activePriceIdx].label}
                                 <X size={10} strokeWidth={2.5} />
                             </button>
                         )}
