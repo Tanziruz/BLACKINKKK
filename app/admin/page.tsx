@@ -8,9 +8,12 @@ export default function AdminLoginPage() {
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(false);
+    const [cooldownTime, setCooldownTime] = useState(0);
 
     async function handleSubmit(e: FormEvent) {
         e.preventDefault();
+        if (cooldownTime > 0) return;
+        
         setError("");
         setLoading(true);
         try {
@@ -24,6 +27,18 @@ export default function AdminLoginPage() {
             } else {
                 const data = await res.json();
                 setError(data.error ?? "Incorrect password.");
+                
+                // Start 5-second cooldown on failure
+                setCooldownTime(5);
+                const timer = setInterval(() => {
+                    setCooldownTime((prev) => {
+                        if (prev <= 1) {
+                            clearInterval(timer);
+                            return 0;
+                        }
+                        return prev - 1;
+                    });
+                }, 1000);
             }
         } catch {
             setError("Something went wrong. Please try again.");
@@ -57,8 +72,9 @@ export default function AdminLoginPage() {
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
                             required
+                            disabled={cooldownTime > 0}
                             autoComplete="current-password"
-                            className="bg-white/5 border border-white/15 text-white rounded-none px-4 py-3 text-sm tracking-wide outline-none focus:border-white/50 transition-colors placeholder:text-white/20"
+                            className="bg-white/5 border border-white/15 text-white rounded-none px-4 py-3 text-sm tracking-wide outline-none focus:border-white/50 transition-colors placeholder:text-white/20 disabled:opacity-50"
                             placeholder="Enter admin password"
                         />
                     </div>
@@ -69,10 +85,10 @@ export default function AdminLoginPage() {
 
                     <button
                         type="submit"
-                        disabled={loading}
+                        disabled={loading || cooldownTime > 0}
                         className="mt-2 bg-white text-black text-xs tracking-[0.2em] uppercase px-6 py-3.5 font-medium hover:bg-white/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                        {loading ? "Verifying…" : "Enter"}
+                        {loading ? "Verifying…" : (cooldownTime > 0 ? `Wait ${cooldownTime}s` : "Enter")}
                     </button>
                 </form>
             </div>

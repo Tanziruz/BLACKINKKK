@@ -14,15 +14,13 @@ interface ButtonProps {
 
 const Button = ({ title, variant, id, leftIcon, rightIcon, className, href }: ButtonProps) => {
   return (
-    <Link href={href}>
-      <button id={id} className={`${variant} btn-anim ${className ?? ""}`.trim()}>
-        {leftIcon}
-        <span className="btn-label">
-          <div className="btn-label-primary">{title}</div>
-          <div className="btn-label-secondary">{title}</div>
-        </span>
-        {rightIcon}
-      </button>
+    <Link id={id} href={href} className={`${variant} btn-anim ${className ?? ""}`.trim()}>
+      {leftIcon}
+      <span className="btn-label">
+        <span className="btn-label-primary">{title}</span>
+        <span className="btn-label-secondary">{title}</span>
+      </span>
+      {rightIcon}
     </Link>
   );
 };
