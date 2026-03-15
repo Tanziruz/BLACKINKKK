@@ -18,6 +18,23 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 
 You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
+## Admin Auth Rate Limiting
+
+Server-side brute-force protection is enforced in `app/api/admin/auth/route.ts`.
+
+Configure these environment variables:
+
+- `ADMIN_LOGIN_MAX_ATTEMPTS` (default: `5`)
+- `ADMIN_LOGIN_WINDOW_SECONDS` (default: `300`)
+- `ADMIN_LOGIN_LOCKOUT_SECONDS` (default: `900`)
+
+For distributed lockout (recommended in production), configure Upstash Redis:
+
+- `UPSTASH_REDIS_REST_URL`
+- `UPSTASH_REDIS_REST_TOKEN`
+
+If Redis is not configured, the app falls back to an in-memory limiter for local/dev usage.
+
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
 ## Learn More
