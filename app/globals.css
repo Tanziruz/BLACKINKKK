@@ -145,23 +145,23 @@
         @apply font-Radiant
     }
 
-    button.btn1 {
+    .btn1 {
         @apply bg-white font-Inter text-black text-[15px] tracking-[-0.03em] leading-[1.55em] rounded-3xl transition duration-300 ease-in-out hover:bg-gray-200 py-2 px-3.75;
     }
 
-    button.btn2{
+    .btn2{
         @apply bg-black rounded-3xl hover:cursor-pointer text-white py-2 px-3.75 font-Inter text-[15px] tracking-[-0.03em] leading-[1.55em] transition duration-300 ease-in-out hover:bg-gray-800;
     }
 
-    button.btn3{
+    .btn3{
         @apply font-Inter text-white text-[15px] tracking-[-0.03em] leading-[1.55em] rounded-3xl bg-white-15 hover:cursor-pointer hover:bg-white-20 transition duration-300 py-2 px-3.75 ;
     }
 
-    button.btn4{
+    .btn4{
         @apply font-Inter text-white text-[18px] tracking-[-0.03em] leading-[1.55em] rounded-3xl bg-black hover:cursor-pointer hover:bg-black/90 transition duration-300 py-2 px-3.75 ;
     }
 
-button.btn5 {
+ .btn5 {
              @apply font-Inter text-white text-[15px] tracking-[-0.03em] leading-[1.55em] rounded-3xl bg-transparent border border-white/10 hover:cursor-pointer hover:bg-white-20 transition duration-300 py-2 px-3.75;
          }
 
@@ -190,7 +190,7 @@ button.btn5 {
         @apply translate-y-0 skew-y-0;
     }
 
-    button.tag-link {
+    .tag-link {
         @apply text-black py-1.5 px-3.5 rounded-full bg-white
     }
 
