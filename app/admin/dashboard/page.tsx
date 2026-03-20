@@ -5,6 +5,7 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import type { Product, ProductTag } from "@/types/product";
 import ImageDropZone from "./ImageDropZone";
+import BillDialog from "@/components/admin/BillDialog";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Types for the "Add Product" form
@@ -154,10 +155,12 @@ function AdminProductCard({
     product,
     onDelete,
     onEdit,
+    onBill,
 }: {
     product: Product;
     onDelete: (id: string) => void;
     onEdit: (product: Product) => void;
+    onBill: (product: Product) => void;
 }) {
     const [confirming, setConfirming] = useState(false);
     const [deleting, setDeleting] = useState(false);
@@ -225,6 +228,16 @@ function AdminProductCard({
                     className="w-full py-2.5 text-xs tracking-widest uppercase font-medium transition-colors bg-white/5 text-white/40 hover:bg-white/10 hover:text-white/70 border-t border-white/10"
                 >
                     Edit
+                </button>
+            )}
+
+            {/* Generate Bill button */}
+            {!confirming && (
+                <button
+                    onClick={() => onBill(product)}
+                    className="w-full py-2.5 text-xs tracking-widest uppercase font-medium transition-colors bg-white/5 text-white/40 hover:bg-white/10 hover:text-white/70 border-t border-white/10"
+                >
+                    Generate Bill
                 </button>
             )}
 
@@ -770,6 +783,7 @@ export default function AdminDashboardPage() {
     const [loading, setLoading] = useState(true);
     const [showModal, setShowModal] = useState(false);
     const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+    const [billingProduct, setBillingProduct] = useState<Product | null>(null);
     const [loggingOut, setLoggingOut] = useState(false);
 
     const fetchProducts = useCallback(async () => {
@@ -843,6 +857,7 @@ export default function AdminDashboardPage() {
                                 product={product}
                                 onDelete={handleDeleted}
                                 onEdit={(p) => setEditingProduct(p)}
+                                onBill={(p) => setBillingProduct(p)}
                             />
                         ))}
                     </div>
@@ -880,6 +895,12 @@ export default function AdminDashboardPage() {
                     }}
                 />
             )}
+
+            {/* Generate Bill Dialog */}
+            <BillDialog
+                product={billingProduct}
+                onClose={() => setBillingProduct(null)}
+            />
         </div>
     );
 }
