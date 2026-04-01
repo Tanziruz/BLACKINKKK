@@ -3,6 +3,7 @@ import "./globals.css";
 import NavWrapper from "@/components/NavWrapper";
 import Footer from "@/components/Home/Footer";
 import LayoutShell from "@/components/LayoutShell";
+import {Analytics} from "@vercel/analytics/next";
 
 export const metadata: Metadata = {
   title: "BLACKINKKK",
@@ -19,6 +20,7 @@ export default function RootLayout({
       <body>
         <LayoutShell nav={<NavWrapper />} footer={<Footer />}>
           {children}
+          <Analytics />  
         </LayoutShell>
       </body>
     </html>

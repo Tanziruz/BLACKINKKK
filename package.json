@@ -13,7 +13,7 @@
     "@fontsource/inter": "^5.2.8",
     "@fontsource/open-sans": "^5.2.7",
     "@upstash/redis": "^1.37.0",
-    "@vercel/analytics": "^1.6.1",
+    "@vercel/analytics": "^2.0.1",
     "class-variance-authority": "^0.7.1",
     "cloudinary": "^2.9.0",
     "clsx": "^2.1.1",
