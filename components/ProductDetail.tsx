@@ -50,12 +50,20 @@ function entry(delay = 0) {
     };
 }
 
-function ContactSheet({ productTitle, onClose }: { productTitle: string; onClose: () => void }) {
+function ContactSheet({
+    productTitle,
+    productId,
+    onClose,
+}: {
+    productTitle: string;
+    productId: string;
+    onClose: () => void;
+}) {
     const waMessage = encodeURIComponent(
-        `Hi! I'm interested in ordering the "${productTitle}". Could you help me with more design options?`
+        `Hello! I want to order "${productTitle}" with the following Product ID: ${productId}. Please advice payment and delivery.`
     );
     const waHref    = `https://wa.me/${CONTACT_WHATSAPP.replace(/\D/g, "")}?text=${waMessage}`;
-    const mailHref  = `mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(`Order Inquiry – ${productTitle}`)}&body=${encodeURIComponent(`Hi,\n\nI'm interested in the ${productTitle} and would like to know more about the available designs.\n\nThank you!`)}`;
+    const mailHref  = `mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(`Order Inquiry – ${productTitle}`)}&body=${encodeURIComponent(`Hi,\n\nI'm interested in the ${productTitle} with the following Product ID: ${productId}, and would like to know more about the available designs.\n\nThank you!`)}`;
     const telHref   = `tel:${CONTACT_PHONE}`;
 
     const options = [
@@ -343,6 +351,7 @@ const FEATURES = [
 export default function ProductDetail({ product }: Props) {
     const hasColors = !!(product.colors && product.colors.length > 0);
     const hasSizes = !!(product.sizes && product.sizes.length > 0);
+    const customerProductId = product.productId ?? product.id;
 
     const [activeColorIndex, setActiveColorIndex] = useState(0);
     const [selectedSize, setSelectedSize] = useState<string | null>(null);
@@ -392,6 +401,7 @@ export default function ProductDetail({ product }: Props) {
                                 src={currentImageMain}
                                 alt={product.title}
                                 fill
+                                sizes="(min-width: 1280px) 46vw, (min-width: 1024px) 48vw, 100vw"
                                 className="object-cover object-center transition-opacity duration-400"
                                 priority
                             />
@@ -413,6 +423,7 @@ export default function ProductDetail({ product }: Props) {
                                                 src={thumb.src || PLACEHOLDER}
                                                 alt={thumb.label}
                                                 fill
+                                                sizes="(min-width: 640px) 48px, 44px"
                                                 className="object-cover object-center"
                                             />
                                         </button>
@@ -440,6 +451,10 @@ export default function ProductDetail({ product }: Props) {
                         <motion.h2 {...entry(0.18)} className="font-Ronzino-Medium text-black text-[28px] sm:text-[34px] md:text-[40px] lg:text-[44px] tracking-[-0.03em] leading-[1.12em] mb-4">
                             {product.title}
                         </motion.h2>
+
+                        <motion.p {...entry(0.22)} className="font-Inter text-[12px] md:text-[13px] text-black/45 tracking-[0.08em] uppercase mb-4">
+                            Product ID: {customerProductId}
+                        </motion.p>
 
                         <motion.div {...entry(0.26)} className="flex items-baseline gap-3 mb-5">
                             <span className="font-Ronzino-Medium text-black text-[22px] md:text-[26px] tracking-[-0.03em] leading-[1.4em]">
@@ -522,6 +537,7 @@ export default function ProductDetail({ product }: Props) {
                         {showContact && (
                             <ContactSheet
                                 productTitle={product.title}
+                                productId={customerProductId}
                                 onClose={() => setShowContact(false)}
                             />
                         )}

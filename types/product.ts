@@ -19,6 +19,7 @@ export interface ProductDetails {
 
 export interface Product {
     id: string;
+    productId?: string;
     title: string;
     price: number;
     originalPrice: number;

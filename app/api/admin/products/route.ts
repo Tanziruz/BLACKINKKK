@@ -46,21 +46,31 @@ export async function GET() {
 export async function POST(request: Request) {
     try {
         const body = await request.json();
+        const sku = String(body.id ?? "").trim();
+        const productId = String(body.productId ?? "").trim();
 
         // Validate minimum required fields
-        if (!body.id || !body.title || body.price == null) {
+        if (!sku || !productId || !body.title || body.price == null) {
             return NextResponse.json(
-                { error: "SKU code, title, and price are required." },
+                { error: "SKU code, Product ID, title, and price are required." },
                 { status: 400 }
             );
         }
 
         // Check for duplicate SKU
         const col = await collection();
-        const existing = await col.findOne({ id: body.id });
+        const existing = await col.findOne({ id: sku });
         if (existing) {
             return NextResponse.json(
                 { error: "A product with this SKU code already exists." },
+                { status: 409 }
+            );
+        }
+
+        const existingProductId = await col.findOne({ productId });
+        if (existingProductId) {
+            return NextResponse.json(
+                { error: "A product with this Product ID already exists." },
                 { status: 409 }
             );
         }
@@ -77,7 +87,8 @@ export async function POST(request: Request) {
         const sizeStocks: SizeStock[] = body.sizeStocks ?? [];
 
         const newProduct: Product = {
-            id: body.id,
+            id: sku,
+            productId,
             title: body.title,
             price: Number(body.price),
             originalPrice: Number(body.originalPrice ?? body.price),

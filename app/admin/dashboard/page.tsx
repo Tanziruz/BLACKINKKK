@@ -22,6 +22,7 @@ type Size = (typeof ALL_SIZES)[number];
 
 interface ProductDraft {
     sku: string;
+    productId: string;
     title: string;
     price: string;
     originalPrice: string;
@@ -41,6 +42,7 @@ interface ProductDraft {
 
 const EMPTY_DRAFT: ProductDraft = {
     sku: "",
+    productId: "",
     title: "",
     price: "",
     originalPrice: "",
@@ -119,6 +121,7 @@ function TextAreaInput({
 function productToDraft(p: Product): ProductDraft {
     return {
         sku: p.id,
+        productId: p.productId ?? "",
         title: p.title,
         price: String(p.price),
         originalPrice: String(p.originalPrice),
@@ -438,6 +441,10 @@ function AddProductModal({
             setError("SKU code is required.");
             return;
         }
+        if (!draft.productId.trim()) {
+            setError("Product ID is required.");
+            return;
+        }
         if (!draft.title.trim() || !draft.price.trim() || !draft.originalPrice.trim()) {
             setError("Title, price, and original price are required.");
             return;
@@ -468,6 +475,7 @@ function AddProductModal({
 
             const body = {
                 id: draft.sku.trim(),
+                productId: draft.productId.trim(),
                 title: draft.title.trim(),
                 price: Number(draft.price),
                 originalPrice: Number(draft.originalPrice),
@@ -546,9 +554,15 @@ function AddProductModal({
                     {/* ── BASIC INFO ── */}
                     <section className="flex flex-col gap-4">
                         <SectionHeading>Basic Info</SectionHeading>
-                        <div className="flex flex-col gap-1.5">
-                            <FieldLabel>SKU Code *</FieldLabel>
-                            <TextInput value={draft.sku} onChange={(v) => set("sku", v.toUpperCase().replace(/\s+/g, "-"))} placeholder="e.g. BLK-TS-001" />
+                        <div className="grid grid-cols-2 gap-3">
+                            <div className="flex flex-col gap-1.5">
+                                <FieldLabel>SKU Code *</FieldLabel>
+                                <TextInput value={draft.sku} onChange={(v) => set("sku", v.toUpperCase().replace(/\s+/g, "-"))} placeholder="e.g. BLK-TS-001" />
+                            </div>
+                            <div className="flex flex-col gap-1.5">
+                                <FieldLabel>Product ID *</FieldLabel>
+                                <TextInput value={draft.productId} onChange={(v) => set("productId", v.toUpperCase().replace(/\s+/g, "-"))} placeholder="e.g. PID-0001" />
+                            </div>
                         </div>
                         <div className="flex flex-col gap-1.5">
                             <FieldLabel>Product name *</FieldLabel>
