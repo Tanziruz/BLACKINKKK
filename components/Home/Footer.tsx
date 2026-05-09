@@ -38,7 +38,7 @@ export default function Footer() {
                             <ColHeading>Quick Links</ColHeading>
                             <FooterLink title="Home" href="/" />
                             <FooterLink title="About" href="/about" />
-                            <FooterLink title="Shop" href="/shop" />
+                            <FooterLink title="Shop" href="/products" />
                         </div>
 
                         <div className="flex flex-col items-start">
