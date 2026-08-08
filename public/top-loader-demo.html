@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Browser Top Loading Progress Bar Demo</title>
+  <style>
+    :root {
+      --bg: #0f0f11;
+      --card: #18181c;
+      --text: #f3f3f5;
+      --accent: #3b82f6;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 24px;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 16px;
+      padding: 32px;
+      max-width: 480px;
+      width: 100%;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+      text-align: center;
+    }
+
+    h1 {
+      font-size: 24px;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
+    p {
+      color: rgba(255, 255, 255, 0.6);
+      font-size: 14px;
+      margin-bottom: 24px;
+      line-height: 1.5;
+    }
+
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      justify-content: center;
+    }
+
+    button {
+      background: rgba(255, 255, 255, 0.08);
+      color: #fff;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      padding: 10px 18px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    button:hover {
+      background: rgba(255, 255, 255, 0.16);
+      border-color: rgba(255, 255, 255, 0.3);
+    }
+
+    button.primary {
+      background: var(--accent);
+      border-color: var(--accent);
+    }
+
+    button.primary:hover {
+      background: #2563eb;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="card">
+    <h1>Top Progress Bar</h1>
+    <p>Thin, smooth 3px loading progress bar fixed to the top of the viewport. Uses custom cubic easing and acceleration curve.</p>
+
+    <div class="controls">
+      <button class="primary" id="btn-start">Start Loading</button>
+      <button id="btn-finish">Finish</button>
+      <button id="btn-inc">+ Increase</button>
+      <button id="btn-set50">Set 50%</button>
+    </div>
+  </div>
+
+  <script src="/top-loader.js"></script>
+  <script>
+    const loader = new TopProgressBar({ color: "#3b82f6", height: "3px" });
+
+    document.getElementById("btn-start").addEventListener("click", () => loader.start());
+    document.getElementById("btn-finish").addEventListener("click", () => loader.finish());
+    document.getElementById("btn-inc").addEventListener("click", () => loader.inc(0.15));
+    document.getElementById("btn-set50").addEventListener("click", () => loader.set(0.5));
+  </script>
+
+</body>
+</html>

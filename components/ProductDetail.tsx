@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect, useCallback } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
@@ -15,6 +15,8 @@ import {
     PhoneCall,
     Ruler,
     X,
+    ChevronLeft,
+    ChevronRight,
 } from "lucide-react";
 import type { Product } from "@/types/product";
 import ProductCardTag from "./Buttons_And_Links/ProductCardTag";
@@ -354,17 +356,58 @@ export default function ProductDetail({ product }: Props) {
     const customerProductId = product.productId ?? product.id;
 
     const [activeColorIndex, setActiveColorIndex] = useState(0);
+    const [direction, setDirection] = useState(1);
     const [selectedSize, setSelectedSize] = useState<string | null>(null);
     const [showContact, setShowContact] = useState(false);
     const [showReturnPolicy, setShowReturnPolicy] = useState(false);
+    const [isPaused, setIsPaused] = useState(false);
+    const [progressKey, setProgressKey] = useState(0);
+    const [isMounted, setIsMounted] = useState(false);
 
-    const currentImageMain = (hasColors
-        ? product.colors![activeColorIndex].image_main
-        : product.image_main) || PLACEHOLDER;
+    useEffect(() => {
+        setIsMounted(true);
+    }, []);
 
-    const thumbnails = hasColors
-        ? product.colors!.map((c) => ({ src: c.image_main, label: c.name }))
-        : [];
+    const displayThumbnails = useMemo(() => {
+        if (hasColors) {
+            return product.colors!.map((c) => ({ src: c.image_main, label: c.name }));
+        }
+        if (product.image_hover && product.image_hover !== product.image_main) {
+            return [
+                { src: product.image_main || PLACEHOLDER, label: "Main" },
+                { src: product.image_hover, label: "Alternate" },
+            ];
+        }
+        return [];
+    }, [hasColors, product]);
+
+    const currentImageMain = useMemo(() => {
+        if (hasColors) return product.colors![activeColorIndex]?.image_main || PLACEHOLDER;
+        if (displayThumbnails.length > 0) return displayThumbnails[activeColorIndex]?.src || PLACEHOLDER;
+        return product.image_main || PLACEHOLDER;
+    }, [hasColors, activeColorIndex, product, displayThumbnails]);
+
+    const nextProductSlide = useCallback(() => {
+        if (displayThumbnails.length <= 1) return;
+        setDirection(1);
+        setActiveColorIndex((prev) => (prev + 1) % displayThumbnails.length);
+        setProgressKey((k) => k + 1);
+    }, [displayThumbnails.length]);
+
+    const prevProductSlide = useCallback(() => {
+        if (displayThumbnails.length <= 1) return;
+        setDirection(-1);
+        setActiveColorIndex((prev) => (prev - 1 + displayThumbnails.length) % displayThumbnails.length);
+        setProgressKey((k) => k + 1);
+    }, [displayThumbnails.length]);
+
+    const handleSelectColor = (index: number) => {
+        if (index === activeColorIndex) return;
+        setDirection(index > activeColorIndex ? 1 : -1);
+        setActiveColorIndex(index);
+        setProgressKey((k) => k + 1);
+    };
+
 
     // Compute stock for the currently selected color + size combination
     const currentStock = useMemo(() => {
@@ -391,43 +434,108 @@ export default function ProductDetail({ product }: Props) {
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ duration: 0.7, ease: E }}
                     >
-                        <div className="relative w-full aspect-4/5 rounded-2xl overflow-hidden bg-beige">
-                            <div className="absolute top-4 left-4 z-10">
+                        <div
+                            className="relative w-full aspect-4/5 rounded-2xl overflow-hidden bg-beige group/prod-slider"
+                            onMouseEnter={() => setIsPaused(true)}
+                            onMouseLeave={() => setIsPaused(false)}
+                        >
+                            <div className="absolute top-4 left-4 z-20">
                                 {product.tag === "new" && <ProductCardTag />}
                                 {product.tag === "best-seller" && <BestSellerTag />}
                             </div>
 
-                            <Image
-                                src={currentImageMain}
-                                alt={product.title}
-                                fill
-                                sizes="(min-width: 1280px) 46vw, (min-width: 1024px) 48vw, 100vw"
-                                className="object-cover object-center transition-opacity duration-400"
-                                priority
-                            />
+                            {/* Main Animated Image */}
+                            <AnimatePresence mode="popLayout" custom={direction}>
+                                <motion.div
+                                    key={currentImageMain + activeColorIndex}
+                                    custom={direction}
+                                    initial={isMounted ? { opacity: 0, x: direction > 0 ? "6%" : "-6%", scale: 1.03 } : false}
+                                    animate={{ opacity: 1, x: "0%", scale: 1 }}
+                                    exit={{ opacity: 0, x: direction < 0 ? "6%" : "-6%", scale: 0.97 }}
+                                    transition={{ duration: 0.6, ease: [0.32, 0.72, 0, 1] }}
+                                    className="absolute inset-0 w-full h-full"
+                                    suppressHydrationWarning
+                                >
+                                    <Image
+                                        src={currentImageMain}
+                                        alt={product.title}
+                                        fill
+                                        sizes="(min-width: 1280px) 46vw, (min-width: 1024px) 48vw, 100vw"
+                                        className="object-cover object-center"
+                                        priority
+                                        suppressHydrationWarning
+                                    />
+                                </motion.div>
+                            </AnimatePresence>
 
-                            {hasColors && (
-                                <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 z-10">
-                                    {thumbnails.map((thumb, i) => (
-                                        <button
-                                            key={i}
-                                            onClick={() => setActiveColorIndex(i)}
-                                            aria-label={thumb.label}
-                                            className={`relative w-11 h-13 sm:w-12 sm:h-14.5 rounded-xl overflow-hidden shrink-0 transition-all duration-200 ${
-                                                i === activeColorIndex
-                                                    ? "ring-2 ring-black ring-offset-1 scale-105"
-                                                    : "ring-1 ring-white/70 hover:ring-white"
-                                            }`}
-                                        >
-                                            <Image
-                                                src={thumb.src || PLACEHOLDER}
-                                                alt={thumb.label}
-                                                fill
-                                                sizes="(min-width: 640px) 48px, 44px"
-                                                className="object-cover object-center"
-                                            />
-                                        </button>
-                                    ))}
+                            {/* Slider Navigation Arrows (shown if > 1 slide) */}
+                            {displayThumbnails.length > 1 && (
+                                <>
+                                    <button
+                                        onClick={prevProductSlide}
+                                        aria-label="Previous image"
+                                        className="absolute left-3 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full bg-black/30 hover:bg-black/60 text-white backdrop-blur-md flex items-center justify-center transition-all opacity-0 group-hover/prod-slider:opacity-100 hover:scale-105 active:scale-95 cursor-pointer"
+                                    >
+                                        <ChevronLeft size={20} />
+                                    </button>
+                                    <button
+                                        onClick={nextProductSlide}
+                                        aria-label="Next image"
+                                        className="absolute right-3 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full bg-black/30 hover:bg-black/60 text-white backdrop-blur-md flex items-center justify-center transition-all opacity-0 group-hover/prod-slider:opacity-100 hover:scale-105 active:scale-95 cursor-pointer"
+                                    >
+                                        <ChevronRight size={20} />
+                                    </button>
+                                </>
+                            )}
+
+                            {/* Thumbnail strip with animated loading progress bar */}
+                            {displayThumbnails.length > 1 && (
+                                <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 z-20 max-w-[90%] overflow-x-auto px-2 py-1">
+                                    {displayThumbnails.map((thumb, i) => {
+                                        const isActive = i === activeColorIndex;
+                                        return (
+                                            <button
+                                                key={i}
+                                                onClick={() => handleSelectColor(i)}
+                                                aria-label={thumb.label}
+                                                className={`relative w-12 h-14.5 sm:w-14 sm:h-16 rounded-xl overflow-hidden shrink-0 transition-all duration-200 ${
+                                                    isActive
+                                                        ? "ring-2 ring-black ring-offset-1 scale-105 shadow-md"
+                                                        : "ring-1 ring-white/70 hover:ring-white opacity-70"
+                                                }`}
+                                            >
+                                                <Image
+                                                    src={thumb.src || PLACEHOLDER}
+                                                    alt={thumb.label}
+                                                    fill
+                                                    sizes="(min-width: 640px) 56px, 48px"
+                                                    className="object-cover object-center"
+                                                    suppressHydrationWarning
+                                                />
+
+                                                {/* Loading progress bar */}
+                                                {isActive && (
+                                                    <div className="absolute bottom-0 left-0 right-0 h-1 bg-black/30 overflow-hidden">
+                                                        <motion.div
+                                                            key={progressKey}
+                                                            className="h-full bg-black"
+                                                            initial={{ width: "0%" }}
+                                                            animate={{ width: isPaused ? "0%" : "100%" }}
+                                                            transition={{
+                                                                duration: isPaused ? 0 : 4,
+                                                                ease: "linear",
+                                                            }}
+                                                            onAnimationComplete={() => {
+                                                                if (!isPaused && displayThumbnails.length > 1) {
+                                                                    nextProductSlide();
+                                                                }
+                                                            }}
+                                                        />
+                                                    </div>
+                                                )}
+                                            </button>
+                                        );
+                                    })}
                                 </div>
                             )}
                         </div>

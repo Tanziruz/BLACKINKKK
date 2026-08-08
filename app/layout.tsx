@@ -5,6 +5,8 @@ import Footer from "@/components/Home/Footer";
 import LayoutShell from "@/components/LayoutShell";
 import {Analytics} from "@vercel/analytics/next";
 
+import TopLoader from "@/components/TopLoader";
+
 export const metadata: Metadata = {
   title: "BLACKINKKK",
   description: "Redefining streetwear with premium oversized t-shirts. Comfort meets style in every piece.",
@@ -23,6 +25,7 @@ export default function RootLayout({
         <link rel="dns-prefetch" href="https://res.cloudinary.com" />
       </head>
       <body suppressHydrationWarning>
+        <TopLoader />
         <LayoutShell nav={<NavWrapper />} footer={<Footer />}>
           {children}
           <Analytics />  
