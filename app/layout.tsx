@@ -17,7 +17,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body>
+      <head>
+        {/* Preconnect to Cloudinary so first image request skips TCP+TLS handshake */}
+        <link rel="preconnect" href="https://res.cloudinary.com" crossOrigin="anonymous" />
+        <link rel="dns-prefetch" href="https://res.cloudinary.com" />
+      </head>
+      <body suppressHydrationWarning>
         <LayoutShell nav={<NavWrapper />} footer={<Footer />}>
           {children}
           <Analytics />  

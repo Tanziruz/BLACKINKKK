@@ -188,8 +188,8 @@ function AdminProductCard({
                         src={product.image_main}
                         alt={product.title}
                         fill
+                        sizes="(min-width: 1280px) 20vw, (min-width: 768px) 25vw, 50vw"
                         className="object-cover group-hover:scale-105 transition-transform duration-500"
-                        unoptimized
                     />
                 ) : (
                     <div className="w-full h-full flex items-center justify-center">

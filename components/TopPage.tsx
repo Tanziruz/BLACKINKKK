@@ -44,10 +44,7 @@ export default function TopPage({ imageSrc, imageAlt, tagTitle, title, descripti
         </EntryItem>
 
         <EntryItem>
-          <p className="t18 text-white-80! text-center mb-3 hidden lg:block">
-            {description}
-          </p>
-          <p className="t18 text-white-80! text-center leading-[1.5em] mb-3 hidden max-lg:block">
+          <p className="t18 text-white-80! text-center leading-[1.5em] mb-3">
             {description}
           </p>
         </EntryItem>

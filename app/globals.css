@@ -1,35 +1,38 @@
-@import "@fontsource/inter/400.css";
-@import "@fontsource/inter/500.css";
 @import "tailwindcss";
 @import "tw-animate-css";
 
 @font-face {
     font-family: Ronzino-Medium;
     src: url(/fonts/Ronzino-Medium.woff2) format("woff2");
+    font-display: swap;
 }
 
 @font-face {
     font-family: Ronzino-Oblique;
     src: url(/fonts/Ronzino-Oblique.otf) format("opentype");
+    font-display: swap;
 }
 
 @font-face {
     font-family: Fino-Sans;
     src: url(/fonts/Fino-Sans-Title-Regular.ttf) format("truetype");
+    font-display: swap;
 }
 
 @font-face {
     font-family: KronaOne;
     src: url(/fonts/KronaOne-Regular.ttf) format("truetype");
+    font-display: swap;
 }
 
 @font-face {
     font-family: Radiant-Condensed;
     src: url(/fonts/Radiant.ttf) format("truetype");
+    font-display: swap;
 }
 
 @theme{
-    --font-Inter: Inter, sans-serif;
+    --font-Inter: system-ui, sans-serif;
     --font-Ronzino-Medium: Ronzino-Medium, sans-serif;
     --font-Ronzino-Oblique: Ronzino-Oblique, sans-serif;
     --font-Fino: Fino-Sans, sans-serif;

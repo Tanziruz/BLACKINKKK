@@ -19,9 +19,11 @@ export default function OurCollection() {
             <div className="flex flex-col min-[950px]:flex-row gap-4 mt-2">
                 <SlideInLeft className="relative w-full min-[950px]:w-1/2 aspect-480/460 rounded-3xl overflow-hidden">
                     <Image
-                        src="/Our_Collection.jpeg"
+                        src="/OurCollection.avif"
                         alt="Men's Collection"
                         fill
+                        loading="lazy"
+                        sizes="(min-width: 950px) 50vw, 100vw"
                         className="object-cover object-center"
                     />
                 </SlideInLeft>

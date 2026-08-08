@@ -9,6 +9,9 @@ interface Props {
     params: Promise<{ id: string }>;
 }
 
+// Both generateMetadata and the page handler call getProductById with the same id.
+// React cache() in lib/products.ts deduplicates these within the same render —
+// only one MongoDB round-trip per request.
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
     const { id } = await params;
     const product = await getProductById(id);
@@ -21,6 +24,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function ProductDetailPage({ params }: Props) {
     const { id } = await params;
+    // Free — result is already cached from generateMetadata call above
     const product = await getProductById(id);
 
     if (!product) {

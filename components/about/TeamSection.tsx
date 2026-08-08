@@ -21,7 +21,7 @@ const members: {
         name: "Sonal Arora",
         role: "Founder",
         tagline: "Where Creativity Meets Culture",
-        portrait: "/Sonal.png",
+        portrait: "/Sonal.avif",
         intro: "Founded by Sonal Arora, BLACKINKKK is more than just a clothing brand—it is a canvas for self-expression. We believe that what you wear should be a reflection of who you are, which is why we specialize in merging creativity, comfort, and culture into bold, wearable art.",
         sections: [
             {
@@ -50,7 +50,7 @@ const members: {
         name: "Bony I",
         role: "Lead Business Consultant",
         tagline: "The Visionary Behind the Ink",
-        portrait: "/Bony.png",
+        portrait: "/Bony.avif",
         intro: "Behind every great brand is a strategic blueprint. For BLACKINKKK, that blueprint was drafted and brought to life by Bony I, our lead Business Consultant. In the fast-paced world of Indian streetwear, a \"vibe\" isn't enough—it requires a marriage of street culture and business rigour. Bony has been the architect of that union, overseeing the vital frameworks that keep us moving forward.",
         sections: [
             {

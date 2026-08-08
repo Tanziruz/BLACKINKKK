@@ -6,24 +6,26 @@ import Button from "../Buttons_And_Links/Button";
 import { EntryStagger, EntryItem } from "../Animate";
 
 const thumbnails = [
-  { src: "/Img1.jpg", label: "Sage Green" },
-  { src: "/Img2.png", label: "Red" },
-  { src: "/Img3.png", label: "Navy Blue" },
-  { src: "/Img4.png", label: "Off White" },
-  { src: "/Img5.png", label: "Black" },
-  {src: "/Img6.png", label: "Maroon" },
+  { src: "/Img1.avif", label: "Sage Green" },
+  { src: "/Img2.avif", label: "Red" },
+  { src: "/Img3.avif", label: "Navy Blue" },
+  { src: "/Img4.avif", label: "Off White" },
+  { src: "/Img5.avif", label: "Black" },
+  { src: "/Img6.avif", label: "Maroon" },
 ];
 
 export default function Hero() {
   const [activeIndex, setActiveIndex] = useState(2);
 
-  // Auto-advance every 5 seconds; reset timer when user clicks
+  // Auto-advance every 5 seconds; remove activeIndex from deps so the
+  // interval is created once and not recreated on every slide change.
   useEffect(() => {
     const timer = setInterval(() => {
       setActiveIndex((prev) => (prev + 1) % thumbnails.length);
     }, 5000);
     return () => clearInterval(timer);
-  }, [activeIndex]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const active = thumbnails[activeIndex];
 
@@ -37,6 +39,7 @@ export default function Hero() {
           fill
           priority
           className="object-cover object-center transition-opacity duration-700"
+          suppressHydrationWarning
         />
         <div className="absolute inset-0 bg-black/30" />
         <div className="absolute inset-x-0 bottom-0 h-2/5 backdrop-blur-3xl mask-[linear-gradient(to_bottom,transparent,black)]" />
@@ -49,11 +52,7 @@ export default function Hero() {
         </EntryItem>
 
         <EntryItem>
-          <p className="t18 text-white-80! text-center mb-3 hidden lg:block">
-            Discover our new range of unisex oversized T-shirts <br/> made for your daily look and
-            your best days.
-          </p>
-          <p className="t18 text-white-80! text-center leading-[1.5em] mb-3 hidden max-lg:block">
+          <p className="t18 text-white-80! text-center leading-[1.5em] mb-3">
             Discover our new range of unisex oversized T-shirts made for your daily look and
             your best days.
           </p>
@@ -91,6 +90,7 @@ export default function Hero() {
                   alt={thumb.label}
                   fill
                   className="object-cover object-center"
+                  suppressHydrationWarning
                 />
               </div>
               {isActive && (

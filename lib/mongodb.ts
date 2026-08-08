@@ -10,6 +10,9 @@ const options: MongoClientOptions = {
   family: 4,
   serverSelectionTimeoutMS: 30000,
   connectTimeoutMS: 30000,
+  socketTimeoutMS: 45000,
+  maxPoolSize: 10,
+  minPoolSize: 1,
 };
 
 let client: MongoClient;

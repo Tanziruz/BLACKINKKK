@@ -12,7 +12,7 @@ export default function Products() {
         <section className="max-w-screen w-screen overflow-hidden">
             <div className="h-dvh">
                 <TopPage 
-                    imageSrc="/Products.png"
+                    imageSrc="/Products.avif"
                     imageAlt="Products Image"
                     tagTitle="The New Season"
                     title="Elevate your daily wardrobe with ease"

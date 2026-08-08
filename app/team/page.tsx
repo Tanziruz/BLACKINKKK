@@ -7,7 +7,7 @@ export default function Team() {
         <section className="max-w-screen w-screen overflow-hidden">
             <div className="h-dvh">
                 <TopPage
-                    imageSrc="/Team.png"
+                    imageSrc="/Team.avif"
                     imageAlt="Team Image"
                     tagTitle="Meet the Team"
                     title="Meet the minds behind BLACKINKKK"

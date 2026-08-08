@@ -10,22 +10,22 @@ import {
 import Image from "next/image";
 
 const slides = [
-      { src: `/CarouselImages/1.png`,   label: '' },
-      { src: `/CarouselImages/2.jpeg`,  label: '' },
-      { src: `/CarouselImages/3.jpeg`,  label: '' },
-      { src: `/CarouselImages/4.jpeg`,  label: '' },
-      { src: `/CarouselImages/5.jpg`,   label: '' },
-      { src: `/CarouselImages/6.jpg`,   label: '' },
-      { src: `/CarouselImages/7.jpg`,   label: '' },
-      { src: `/CarouselImages/8.jpg`,   label: '' },
-      { src: `/CarouselImages/9.jpg`,   label: '' },
-      { src: `/CarouselImages/10.jpg`,  label: '' },
-      { src: `/CarouselImages/11.jpg`,  label: '' },
-      { src: `/CarouselImages/12.jpg`,  label: '' },
-      { src: `/CarouselImages/13.jpg`,  label: '' },
-      { src: `/CarouselImages/14.jpg`,  label: '' },
-      { src: `/CarouselImages/15.jpg`,  label: '' },
-      { src: `/CarouselImages/16.jpeg`, label: '' },
+  { src: `/CarouselImages/1.avif`,   label: '' },
+  { src: `/CarouselImages/2.avif`,   label: '' },
+  { src: `/CarouselImages/3.avif`,   label: '' },
+  { src: `/CarouselImages/4.avif`,   label: '' },
+  { src: `/CarouselImages/5.avif`,   label: '' },
+  { src: `/CarouselImages/6.avif`,   label: '' },
+  { src: `/CarouselImages/7.avif`,   label: '' },
+  { src: `/CarouselImages/8.avif`,   label: '' },
+  { src: `/CarouselImages/9.avif`,   label: '' },
+  { src: `/CarouselImages/10.avif`,  label: '' },
+  { src: `/CarouselImages/11.avif`,  label: '' },
+  { src: `/CarouselImages/12.avif`,  label: '' },
+  { src: `/CarouselImages/13.avif`,  label: '' },
+  { src: `/CarouselImages/14.avif`,  label: '' },
+  { src: `/CarouselImages/15.avif`,  label: '' },
+  { src: `/CarouselImages/16.avif`, label: '' },
 ];
 
 /* ── constants ── */
@@ -71,6 +71,7 @@ function Card({ src, label }: { src: string; label: string }) {
         draggable={false}
         width={600}
         height={800}
+        suppressHydrationWarning
       />
     </div>
   );

@@ -2,7 +2,6 @@
 import Image from "next/image";
 import Link from "next/link";
 import ProductImageSwitch from "../Buttons_And_Links/ProductImageSwitch";
-import { useState } from "react";
 import ProductPageArrow from "../Buttons_And_Links/ProductPageArrow";
 
 // Transparent 1×1 grey placeholder used when a product has no image yet
@@ -22,18 +21,13 @@ interface ProductCardProps {
 }
 
 export default function ProductCard({ id, image_main, image_hover, tag, title, price, originalPrice, stock, sizes }: ProductCardProps) {
-    const [hovered, setHovered] = useState(false);
     const soldOut = stock === 0;
     const mainSrc  = image_main  || PLACEHOLDER;
     const hoverSrc = image_hover || image_main || PLACEHOLDER;
 
     return (
         <Link href={`/products/${id}`} className="block w-full h-fit">
-        <div
-            className="group w-full h-fit hover:cursor-pointer"
-            onMouseEnter={() => setHovered(true)}
-            onMouseLeave={() => setHovered(false)}
-        >
+        <div className="group w-full h-fit hover:cursor-pointer">
             <div id="product-image" className="relative w-full aspect-373/420 rounded-2xl overflow-hidden px-2 pt-2">
                 {/* Tag */}
                 <div className="relative top-1 left-1 z-10">
@@ -52,12 +46,16 @@ export default function ProductCard({ id, image_main, image_hover, tag, title, p
                     src={mainSrc}
                     alt="Product_Image"
                     fill
+                    loading="lazy"
+                    sizes="(min-width: 1280px) 25vw, (min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
                     className="object-cover object-center transition-opacity duration-500 opacity-100 group-hover:opacity-0"
                 />
                 <Image
                     src={hoverSrc}
                     alt="Product_Image_Hover"
                     fill
+                    loading="lazy"
+                    sizes="(min-width: 1280px) 25vw, (min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
                     className="object-cover object-center transition-opacity duration-500 opacity-0 group-hover:opacity-100"
                 />
 
@@ -87,9 +85,10 @@ export default function ProductCard({ id, image_main, image_hover, tag, title, p
                             <p className="font-Ronzino-Medium text-gray-2 text-[15px] tracking-[-0.035em] leading-[1.5em] line-through">₹{originalPrice}</p>
                         )}
                     </div>
+                    {/* Image switch indicators use CSS group-hover via isActive=true on main, false on hover */}
                     <div className="flex items-center gap-2 relative bottom-4">
-                        <ProductImageSwitch image={mainSrc} isActive={!hovered}/>
-                        <ProductImageSwitch image={hoverSrc} isActive={hovered}/>
+                        <ProductImageSwitch image={mainSrc} isActive={true}/>
+                        <ProductImageSwitch image={hoverSrc} isActive={false}/>
                     </div>
                 </div>
                 {sizes && sizes.length > 0 && (

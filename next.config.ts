@@ -8,15 +8,56 @@ const nextConfig: NextConfig = {
                 hostname: "res.cloudinary.com",
             },
         ],
+        formats: ["image/avif", "image/webp"],
+        deviceSizes: [640, 750, 828, 1080, 1200, 1920],
+        imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
     },
 
     async headers() {
         return [
-            // ── HTML pages: never cache at CDN/proxy level ──
-            // Hostinger (and any reverse proxy) will not store these responses.
-            // Visitors always receive the latest server-rendered output.
+            // Static Next.js assets
             {
-                source: "/((?!_next/static|_next/image|favicon.ico).*)",
+                source: "/_next/static/:path*",
+                headers: [
+                    {
+                        key: "Cache-Control",
+                        value: "public, max-age=31536000, immutable",
+                    },
+                ],
+            },
+            // Next.js optimized images
+            {
+                source: "/_next/image",
+                headers: [
+                    {
+                        key: "Cache-Control",
+                        value: "public, max-age=86400, stale-while-revalidate=604800",
+                    },
+                ],
+            },
+            // Public fonts
+            {
+                source: "/fonts/:path*",
+                headers: [
+                    {
+                        key: "Cache-Control",
+                        value: "public, max-age=31536000, immutable",
+                    },
+                ],
+            },
+            // Public image files
+            {
+                source: "/:path*.(avif|webp|png|jpg|jpeg|gif|svg|ico)",
+                headers: [
+                    {
+                        key: "Cache-Control",
+                        value: "public, max-age=2592000, stale-while-revalidate=86400",
+                    },
+                ],
+            },
+            // Dynamic HTML pages
+            {
+                source: "/((?!_next/static|_next/image|favicon.ico|fonts).*)",
                 headers: [
                     {
                         key: "Cache-Control",
@@ -26,28 +67,10 @@ const nextConfig: NextConfig = {
                     { key: "Expires", value: "0" },
                 ],
             },
-            // ── Next.js static assets: safe to cache forever (filenames are content-hashed) ──
-            {
-                source: "/_next/static/(.*)",
-                headers: [
-                    {
-                        key: "Cache-Control",
-                        value: "public, max-age=31536000, immutable",
-                    },
-                ],
-            },
-            // ── Public folder images / fonts ──
-            {
-                source: "/fonts/(.*)",
-                headers: [
-                    {
-                        key: "Cache-Control",
-                        value: "public, max-age=31536000, immutable",
-                    },
-                ],
-            },
         ];
     },
 };
 
 export default nextConfig;
+
+
